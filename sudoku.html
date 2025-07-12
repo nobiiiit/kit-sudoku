@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudoku 5x5 Soal Pop-up</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .sudoku-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-template-rows: repeat(5, 60px);
+      gap: 5px;
+      margin-top: 20px;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      background-color: white;
+      border: 1px solid #999;
+      text-align: center;
+      line-height: 60px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #score {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .modal-content img {
+        margin-top: 10px;
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <h1>Sudoku 5x5 - Mode Soal</h1>
+    <div>
+      <label for="playerName">Nama Pemain: </label>
+      <input type="text" id="playerName" placeholder="Masukkan nama Anda" />
+      <button onclick="startGame()">Mulai Game</button>
+    </div>
+    <div id="grid" class="sudoku-grid"></div>
+    <div id="score">Skor: 0</div>
+    <div id="leaderboard"></div>
+  </div>
+
+  <!-- Modal Soal -->
+  <div id="questionModal" class="modal hidden">
+    <div class="modal-content">
+      <p id="questionText">Soal akan muncul di sini.</p>
+      <input type="text" id="answerInput" placeholder="Masukkan jawaban" />
+      <button onclick="submitAnswer()">Submit</button>
+      <button onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+
+  <script>
+    const soalMap = {
+        0: "Dari rangkaian di bawah berapa beda potensial antara a dengan b? <br><img src= 'fisdoku/img/soal1.jpeg' width='100'>",
+        1: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        2: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        3: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        4: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        5: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        6: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        7: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        8: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        9: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        10: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        11: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        12: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        13: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        14: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        15: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        16: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        17: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        18: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        19: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        20: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        21: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        22: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        22: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        23: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+        24: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
+    };
+    const jawabanMap = {
+        0: "a",
+        1: "-1",
+        2: "0.1",
+        3: "A",
+        4: "1",
+        5: "A",
+        6: "1",
+        7: "a",
+        8: "0.1",
+        9: "-1",
+        10: "1",
+        11: "0.1",
+        12: "A",
+        13: "-1",
+        14: "a",
+        15: "-1",
+        16: "A",
+        17: "1",
+        18: "a",
+        19: "0.1",
+        20: "0.1",
+        21: "a",
+        22: "-1",
+        23: "1",
+        24: "A"
+    };
+
+    let currentCell = null;
+    let score = 0;
+
+    function startGame() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      score = 0;
+      document.getElementById('score').textContent = 'Skor: 0';
+
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', () => openQuestion(i, cell));
+        grid.appendChild(cell);
+      }
+    }
+
+    function openQuestion(index, cell) {
+      currentCell = cell;
+      document.getElementById('questionText').innerHTML = soalMap[index];
+      document.getElementById('answerInput').value = '';
+      document.getElementById('questionModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('questionModal').classList.add('hidden');
+    }
+
+    function submitAnswer() {
+      const input = document.getElementById('answerInput').value.trim();
+      const index = parseInt(currentCell.dataset.index);
+      const correct = jawabanMap[index];
+
+      if (input === correct) {
+        currentCell.textContent = input;
+        score += 4;
+      } else {
+        currentCell.textContent = '❌';
+        score -= 0;
+      }
+
+      document.getElementById('score').textContent = `Skor: ${score}`;
+      closeModal();
+    }
+  </script>
+</body>
+</html>
