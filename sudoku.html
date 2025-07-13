@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sudoku 5x5 Soal Pop-up</title>
   <link rel="stylesheet" href="style.css" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -62,20 +63,53 @@
 
     .modal-content {
       background: white;
-      padding: 20px;
+      padding: 50px;
       border-radius: 10px;
-      width: 300px;
+      width: 500px;
       text-align: center;
     }
 
     .modal-content img {
         margin-top: 10px;
+        width: 300px;
         max-width: 100%;
         height: auto;
         border: 1px solid #ccc;
         border-radius: 5px;
     }
+
+    #leaderboard {
+      margin-top: 20px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 300px;
+    } 
+
+    .cell:hover {
+      background-color: #d0eaff;
+    }
+
+    .cell.answered-by-other {
+      background-color: #ffe4e1 !important;
+    }
+
+    .cell.answered-by-you {
+      background-color: #defdff !important;
+    }
+
+    .answered-by-other {
+      background-color: #ffdede !important;
+    }
+
+    .answered-by-you {
+      background-color: #defdff !important;
+    }
   </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
   <div id="game">
@@ -87,22 +121,54 @@
     </div>
     <div id="grid" class="sudoku-grid"></div>
     <div id="score">Skor: 0</div>
+    <div id="timers">
+      <p>Timer: <span id="playerTimer">00:00</span></p>
+    </div>
     <div id="leaderboard"></div>
+    <button onclick="resetLeaderboard()">Reset Leaderboard</button>
+    <button onclick="finishGame()">Selesai</button>
+    <button onclick="resetGameData()">Reset Game</button>
   </div>
 
   <!-- Modal Soal -->
   <div id="questionModal" class="modal hidden">
     <div class="modal-content">
       <p id="questionText">Soal akan muncul di sini.</p>
-      <input type="text" id="answerInput" placeholder="Masukkan jawaban" />
+      <div id="answerOptions">
+        <label><input type="radio" name="choice" value="a"> a</label><br>
+        <label><input type="radio" name="choice" value="b"> b</label><br>
+        <label><input type="radio" name="choice" value="c"> c</label><br>
+        <label><input type="radio" name="choice" value="d"> d</label><br>
+        <label><input type="radio" name="choice" value="e"> e</label>
+      </div>
       <button onclick="submitAnswer()">Submit</button>
       <button onclick="closeModal()">Tutup</button>
     </div>
   </div>
 
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDRb1bnNWXp-0L1nzvxJgUCVhTGwAojK38",
+      authDomain: "fisdoku-multiplayer.firebaseapp.com",
+      databaseURL: "https://fisdoku-multiplayer-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "fisdoku-multiplayer",
+      storageBucket: "fisdoku-multiplayer.appspot.com",
+      messagingSenderId: "538766866299",
+      appId: "1:538766866299:web:0dcac6fab57feda27dafde",
+      measurementId: "G-4ERK2VJDQV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     const soalMap = {
-        0: "Dari rangkaian di bawah berapa beda potensial antara a dengan b? <br><img src= 'fisdoku/img/soal1.jpeg' width='100'>",
+        0: `Dari rangkaian di bawah berapa beda potensial antara a dengan b? <br><img src= 'img/soal1.jpeg' width='200px'> <br><br>
+            a. abcdefg <br>
+            b. abcdefg <br>
+            c. abcdefg <br>
+            d. abcdefg <br>
+            e. abcdefg <br>
+        `,
         1: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
         2: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
         3: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
@@ -125,46 +191,108 @@
         20: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
         21: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
         22: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
-        22: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
         23: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
         24: "Dari rangkaian di bawah berapa beda potensial antara a dengan b?",
     };
+
     const jawabanMap = {
         0: "a",
-        1: "-1",
-        2: "0.1",
-        3: "A",
-        4: "1",
-        5: "A",
-        6: "1",
-        7: "a",
-        8: "0.1",
-        9: "-1",
-        10: "1",
-        11: "0.1",
-        12: "A",
-        13: "-1",
-        14: "a",
-        15: "-1",
-        16: "A",
-        17: "1",
+        1: "b",
+        2: "c",
+        3: "d",
+        4: "e",
+        5: "e",
+        6: "a",
+        7: "b",
+        8: "c",
+        9: "d",
+        10: "d",
+        11: "e",
+        12: "a",
+        13: "b",
+        14: "c",
+        15: "c",
+        16: "d",
+        17: "e",
         18: "a",
-        19: "0.1",
-        20: "0.1",
-        21: "a",
-        22: "-1",
-        23: "1",
-        24: "A"
+        19: "a",
+        20: "b",
+        21: "c",
+        22: "d",
+        23: "e",
+        24: "a"
     };
 
     let currentCell = null;
     let score = 0;
+    let answeredCount = 0;
+    let leaderboardData = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    let currentPlayer = "";
+    let timerInterval;
+    let totalSeconds = 0;
+
+    function startTimer(){
+      clearInterval(timerInterval);
+      totalSeconds = 0;
+      timerInterval = setInterval(() => {
+        totalSeconds++;
+        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('playerTimer').textContent = `${minutes}:${seconds}`;
+      }, 1000);
+    }
+
+    function updateLeaderboard(name, newScore) {
+      leaderboardData = leaderboardData.filter(entry=> entry.name !==name);
+      leaderboardData.push({name, score: newScore});
+
+      leaderboardData.sort((a,b) => b.score - a.score);
+      database.ref('leaderboard').set(leaderboardData);
+      localStorage.setItem("leaderboard", JSON.stringify(leaderboardData));
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard() {
+      const board = document.getElementById("leaderboard")
+      board.innerHTML = "<h3>Leaderboard</h3>";
+
+      database.ref('leaderboard').once('value', snapshot => {
+        const data = snapshot.val() || [];
+        leaderboardData = data;
+        data.slice(0, 5).forEach((entry, indx) => {
+          board.innerHTML += `<div> ${indx + 1}. ${entry.name} - ${entry.score} poin</div>`;
+        });
+      });
+    }
+
+    function resetLeaderboard() {
+      if (confirm("Apakah Anda yakin ingin menghapus seluruh leaderboard?")) {
+        localStorage.removeItem("leaderboard");
+        leaderboardData = [];
+        renderLeaderboard();
+
+        database.ref('leaderboard').remove()
+        .then(() => {
+          console.log("Leaderboard berhasil dihapus.")
+        })
+          .catch((error) => {
+          console.error("Gagal menghapus leaderboard:", error)
+        })
+      }
+    }
 
     function startGame() {
+      console.log("Game dimulai");
+
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
       score = 0;
+      answeredCount = 0;
+
+      currentPlayer = document.getElementById("playerName").value.trim() || "Anonim";
       document.getElementById('score').textContent = 'Skor: 0';
+      renderLeaderboard();
+      startTimer();
 
       for (let i = 0; i < 25; i++) {
         const cell = document.createElement('div');
@@ -173,13 +301,30 @@
         cell.addEventListener('click', () => openQuestion(i, cell));
         grid.appendChild(cell);
       }
+      listenForOpponentMoves();
+    }
+
+    function listenForOpponentMoves() {
+      database.ref("answers").on("value", snapshot => {
+        const allAnswers = snapshot.val() || {};
+        Object.entries(allAnswers).forEach(([index, entry]) => {
+          const cell = document.querySelector(`.cell[data-index="${index}"]`);
+          if (cell && entry.player !== currentPlayer && cell.textContent === "") {
+            cell.textContent = "";
+            cell.classList.add("answered-by-other");
+          }
+        });
+      });
     }
 
     function openQuestion(index, cell) {
       currentCell = cell;
       document.getElementById('questionText').innerHTML = soalMap[index];
-      document.getElementById('answerInput').value = '';
       document.getElementById('questionModal').classList.remove('hidden');
+      const radios = document.getElementsByName('choice');
+      for (const radio of radios) {
+        radio.checked = false;
+      }
     }
 
     function closeModal() {
@@ -187,20 +332,93 @@
     }
 
     function submitAnswer() {
-      const input = document.getElementById('answerInput').value.trim();
+      const radios = document.getElementsByName('choice');
+      let input = '';
+      for (const radio of radios) {
+        if (radio.checked) {
+          input = radio.value;
+          break;
+        }
+      }
       const index = parseInt(currentCell.dataset.index);
       const correct = jawabanMap[index];
 
+      if (!input) {
+        alert("Silakan pilih jawaban a, b, c, d, atau e.");
+        return;
+      }
+
       if (input === correct) {
         currentCell.textContent = input;
+        currentCell.classList.add("answered-by-you");
         score += 4;
       } else {
         currentCell.textContent = '❌';
+        currentCell.classList.add("answered-by-you");
         score -= 0;
       }
-
+    
+      answeredCount++;
       document.getElementById('score').textContent = `Skor: ${score}`;
       closeModal();
+
+      database.ref(`answers/${index}`).set({
+        player: currentPlayer,
+        answer: input
+      });
+
+      updateLeaderboard(currentPlayer, score);
+
+      if (answeredCount === 25) {
+        alert ("Permainan selesai!\nSkor akhir: " + score);
+      }
+    }
+
+    function finishGame() {
+      clearInterval(timerInterval);
+      const finalTime = document.getElementById('playerTimer').textContent;
+
+      const finalData = {
+        name: currentPlayer,
+        score: score,
+        time: finalTime,
+        timestamp: Date.now()
+      };
+
+      database.ref('finalScores').push(finalData)
+        .then(() => {
+          alert(`Game selesai!\nSkor akhir: ${score}\nWaktu: ${finalTime}`);
+        })
+        .catch(err => {
+          console.error("Gagal menyimpan skor akhir", err);
+        });
+    }
+
+    function resetGameData() {
+      if (confirm("Apakah Anda yakin ingin mereset semua data permainan? Semua jawaban, skor, dan leaderboard akan dihapus.")) {
+        const updates = {
+          answers: null,
+          leaderboard: null,
+          finalScores: null
+        };
+
+        firebase.database().ref().update(updates)
+          .then(() => {
+            alert("Semua data permainan berhasil direset.");
+            // Reset tampilan game
+            const grid = document.getElementById("grid");
+            grid.innerHTML = '';
+            document.getElementById("score").textContent = "Skor: 0";
+            document.getElementById("playerTimer").textContent = "00:00";
+            leaderboardData = [];
+            localStorage.removeItem("leaderboard");
+            renderLeaderboard();
+          })
+          .catch(error => {
+            console.error("Gagal mereset data:", error);
+            alert("Terjadi kesalahan saat mereset data.");
+          });
+      }
     }
   </script>
 </body>
