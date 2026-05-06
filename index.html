@@ -246,14 +246,23 @@
       font-family: 'Orbitron', sans-serif;
     }
 
+    #questionText img {
+      display: block;
+      margin: 0 auto 15px auto;
+      max-width: 100%;       /* Gambar tidak akan lebih lebar dari modal */
+      height: auto;          /* Menjaga rasio gambar */
+      border-radius: 8px;    /* Agar sudut gambar tidak tajam */
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+    }
+
     .modal-body {
       padding: 25px;
-      text-align: left; /* Ubah ke left agar soal panjang lebih enak dibaca */
+      text-align: center; /* Ubah ke left agar soal panjang lebih enak dibaca */
       font-size: 16px;
-      max-height: 50vh; /* Batasi tinggi maksimal 50% layar */
+      max-height: 60vh; /* Batasi tinggi maksimal 50% layar */
       overflow-y: auto; /* Munculkan scrollbar jika teks terlalu panjang */
       line-height: 1.6;
-      word-wrap: break-word;
     }
 
     .modal-options {
@@ -269,13 +278,6 @@
       gap: 20px;
       padding: 20px;
       border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    #questionText {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
     }
   </style>
 
@@ -423,24 +425,24 @@
         const csvText = await response.text();
         
         const rows = csvText.split('\n').slice(1); 
-        
-        rows.forEach((row, index) => {
-          if (row.trim() === "") return;
-          const columns = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g);
-          
-          if (columns && columns.length >= 2) {
-            // Kolom terakhir selalu kita anggap kunci jawaban
-            let kunciRaw = columns[columns.length - 1].replace(/^"|"$/g, '').trim().toLowerCase();
-            
-            // Semua kolom sebelumnya kita gabungkan kembali sebagai soal
-            // Ini untuk jaga-jaga kalau soalnya terpecah karena koma
-            let soalRaw = columns.slice(0, columns.length - 1).join(',').replace(/^"|"$/g, '').trim();
 
-            soalMap[index] = soalRaw;
-            jawabanMap[index] = kunciRaw;
-            console.log(`Soal ${index}: ${soalRaw.substring(0,30)}... | Kunci: ${kunciRaw}`);
-          }
-        });
+        rows.forEach((row, index) => {
+              if (row.trim() === "") return;
+              
+              // Regex ini lebih aman untuk memisahkan koma di dalam link/teks
+              const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+              
+              if (columns && columns.length >= 2) {
+                  // Ambil kunci dari kolom terakhir
+                  let kunciRaw = columns[columns.length - 1].replace(/^"|"$/g, '').trim().toLowerCase();
+                  
+                  // Gabungkan kolom sisanya sebagai soal (link gambar)
+                  let soalRaw = columns.slice(0, columns.length - 1).join(',').replace(/^"|"$/g, '').trim();
+          
+                  soalMap[index] = soalRaw;
+                  jawabanMap[index] = kunciRaw;
+              }
+          });
 
         if (Object.keys(soalMap).length === 0) {
           throw new Error("Data soal kosong.");
@@ -526,36 +528,45 @@
     }
 
     function chooseNumber(num) {
-      const idx = parseInt(currentCell.dataset.index);
-      const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
-
-      if (soalCells.includes(idx)) {
-          currentCell.textContent = num; 
-          const sIdx = soalOrder[soalCells.indexOf(idx)];
-          
-          let isiSoal = soalMap[sIdx];
-          
-          // Deteksi otomatis jika isinya adalah URL (gambar)
-          if (isiSoal.startsWith("http")) {
-            document.getElementById('questionText').innerHTML = `<img src="${isiSoal}" style="max-width: 100%; max-height: 45vh; object-fit: contain; border-radius: 8px; display: block; margin: 0 auto;" alt="Soal Gambar">`;
-          } else {
-            // Jika isinya bukan link, tetap tampilkan sebagai teks biasa
-            document.getElementById('questionText').innerHTML = isiSoal;
-          }
-          
-          document.getElementById('questionModal').classList.remove('hidden');
+        const idx = parseInt(currentCell.dataset.index);
+        const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
+    
+        // Tutup modal input angka
+        closeNumberModal();
+    
+        // 1. Cek apakah angka Sudoku benar
+        if (num === correct) {
+            // 2. Cek apakah kotak ini memiliki tantangan soal
+            if (soalCells.includes(idx)) {
+                currentCell.textContent = num; // Tampilkan angka sementara
+                const sIdx = soalOrder[soalCells.indexOf(idx)];
+                let isiSoal = soalMap[sIdx];
+    
+                // Tampilkan Gambar jika isinya URL, jika bukan tampilkan Teks
+                if (isiSoal.includes("http")) {
+                    document.getElementById('questionText').innerHTML = `
+                        <p style="margin-bottom:10px; color:var(--neon-cyan)">Perhatikan Gambar Berikut:</p>
+                        <img src="${isiSoal}" alt="Soal Fisika">
+                    `;
+                } else {
+                    document.getElementById('questionText').innerHTML = `<p>${isiSoal}</p>`;
+                }
+    
+                document.getElementById('questionModal').classList.remove('hidden');
+            } else {
+                // Jika tidak ada soal, langsung dapat poin
+                score += 25;
+                updateScore();
+                currentCell.textContent = num;
+                currentCell.classList.add("answered-by-you");
+                database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
+            }
         } else {
-          score += 25;
-          updateScore();
-          currentCell.textContent = num;
-          currentCell.classList.add("answered-by-you");
-          database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
+            // Jika angka Sudoku salah
+            score -= 10;
+            updateScore();
+            alert("❌ Angka Sudoku Salah! Skor -10.");
         }
-      } else {
-        score -= 10;
-        updateScore();
-        alert("❌ Salah! Skor -10.");
-      }
     }
 
     function submitAnswer() {
