@@ -72,12 +72,6 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    .sudoku-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
     .sudoku-grid {
       display: grid;
       grid-template-columns: repeat(6, 65px);
@@ -86,12 +80,10 @@
       background: var(--neon-blue);
       padding: 4px;
       border-radius: 8px;
-      box-shadow: 0 0 15px rgba(69, 162, 158, 0.5);
     }
 
     .cell {
-      width: 65px;
-      height: 65px;
+      width: 65px; height: 65px;
       background: var(--bg-color);
       color: white;
       text-align: center;
@@ -99,186 +91,72 @@
       font-size: 24px;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.3s ease;
       font-family: 'Orbitron', sans-serif;
     }
 
-    .cell:hover:not(.prefilled):not(.answered-by-other) {
-      background: rgba(102, 252, 241, 0.2);
-      box-shadow: inset 0 0 10px var(--neon-cyan);
-    }
-
-    .cell.prefilled {
-      background: #1a1a24;
-      color: var(--neon-blue);
-      cursor: default;
-    }
-
-    .cell.answered-by-you {
-      color: var(--neon-green);
-      text-shadow: 0 0 8px var(--neon-green);
-    }
-
-    .cell.answered-by-other {
-      color: var(--neon-yellow);
-      text-shadow: 0 0 8px var(--neon-yellow);
-      background: rgba(255, 215, 0, 0.1);
-      cursor: not-allowed;
-    }
-
-    .side-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+    .cell.prefilled { background: #1a1a24; color: var(--neon-blue); cursor: default; }
+    .cell.answered-by-you { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
+    .cell.answered-by-other { color: var(--neon-yellow); background: rgba(255, 215, 0, 0.1); cursor: not-allowed; }
 
     .stat-box {
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid;
       padding: 15px;
-      font-weight: bold;
       border-radius: 8px;
       text-align: center;
-      font-size: 18px;
-      letter-spacing: 1px;
+      margin-bottom: 15px;
     }
-
-    .score-box { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,153,0.2); }
-    .timer-box { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 10px rgba(102,252,241,0.2); }
-
-    button {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    .score-box { border-color: var(--neon-green); color: var(--neon-green); }
+    .timer-box { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 
     .btn-action {
       padding: 10px 15px;
       border: none;
       width: 100%;
       margin-top: 10px;
-    }
-
-    .btn-cyan { background: transparent; border: 2px solid var(--neon-cyan); color: var(--neon-cyan); }
-    .btn-cyan:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
-    
-    .btn-red { background: transparent; border: 2px solid var(--neon-red); color: var(--neon-red); }
-    .btn-red:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); }
-
-    .btn-green { background: transparent; border: 2px solid var(--neon-green); color: var(--neon-green); }
-    .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
-
-    .player-input {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 30px;
-      background: var(--panel-bg);
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 600px;
-      margin: 0 auto 30px auto;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .player-input input {
-      padding: 10px 15px;
-      font-size: 16px;
-      border: 1px solid var(--neon-blue);
-      background: rgba(0,0,0,0.5);
-      color: white;
+      font-weight: 600;
+      cursor: pointer;
       border-radius: 6px;
-      outline: none;
     }
-
-    .start-btn {
-      background: var(--neon-yellow);
-      color: #000;
-      border: none;
-      padding: 10px 25px;
-      box-shadow: 0 0 10px rgba(255,215,0,0.5);
-    }
+    .btn-cyan { border: 2px solid var(--neon-cyan); color: var(--neon-cyan); background: transparent; }
+    .btn-red { border: 2px solid var(--neon-red); color: var(--neon-red); background: transparent; }
+    .btn-green { border: 2px solid var(--neon-green); color: var(--neon-green); background: transparent; }
 
     .modal {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       z-index: 999;
     }
-
-    .modal.hidden { display: none; }
+    .hidden { display: none; }
     
     .modal-content {
       background: var(--panel-bg);
       border: 1px solid var(--neon-cyan);
       border-radius: 12px;
-      width: 600px;
-      max-width: 95%;
-      box-shadow: 0 0 30px rgba(102, 252, 241, 0.3);
-      animation: fadeIn 0.3s ease;
+      width: 600px; max-width: 95%;
       color: white;
-      display: flex;
-      flex-direction: column;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .modal-header {
-      background: rgba(102, 252, 241, 0.1);
-      border-bottom: 1px solid var(--neon-cyan);
-      color: var(--neon-cyan);
-      text-align: center;
-      font-weight: bold;
-      padding: 15px;
-      font-size: 20px;
-      font-family: 'Orbitron', sans-serif;
-    }
-
+    .modal-header { padding: 15px; text-align: center; border-bottom: 1px solid var(--neon-cyan); font-family: 'Orbitron'; }
+    .modal-body { padding: 20px; text-align: center; max-height: 60vh; overflow-y: auto; }
+    
+    /* CSS UNTUK GAMBAR SOAL */
     #questionText img {
-      display: block;
-      margin: 0 auto 15px auto;
-      max-width: 100%;       /* Gambar tidak akan lebih lebar dari modal */
-      height: auto;          /* Menjaga rasio gambar */
-      border-radius: 8px;    /* Agar sudut gambar tidak tajam */
-      border: 2px solid var(--neon-cyan);
-      box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+        display: block;
+        margin: 0 auto 15px auto;
+        max-width: 100%;
+        height: auto;
+        border: 2px solid var(--neon-cyan);
+        border-radius: 8px;
     }
 
-    .modal-body {
-      padding: 25px;
-      text-align: center; /* Ubah ke left agar soal panjang lebih enak dibaca */
-      font-size: 16px;
-      max-height: 60vh; /* Batasi tinggi maksimal 50% layar */
-      overflow-y: auto; /* Munculkan scrollbar jika teks terlalu panjang */
-      line-height: 1.6;
-    }
-
-    .modal-options {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      padding: 0 25px 25px 25px;
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
+    .modal-options { display: flex; justify-content: center; gap: 10px; padding: 20px; }
+    .modal-options button { width: 50px; height: 50px; font-weight: bold; cursor: pointer; }
+    
+    .player-input { text-align: center; margin-bottom: 20px; }
+    .player-input input { padding: 10px; border-radius: 5px; border: 1px solid var(--neon-blue); background: #000; color: #fff; }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -289,7 +167,7 @@
 
   <div class="player-input" id="playerInputBox">
     <input type="text" id="playerName" placeholder="Masukkan Nama..." />
-    <button class="start-btn" onclick="startGame()">START GAME</button>
+    <button class="btn-action btn-green" style="width:auto;" onclick="startGame()">START GAME</button>
   </div>
 
   <div class="game-container">
@@ -298,12 +176,11 @@
       <div id="leaderboardList"></div>
     </div>
 
-    <div class="sudoku-wrapper">
+    <div class="sudoku-wrapper" style="display:flex; flex-direction:column; align-items:center;">
       <div id="grid" class="sudoku-grid"></div>
-      <div class="bottom-buttons" style="display:flex; gap:10px; width:100%; margin-top:20px;">
+      <div style="display:flex; gap:10px; margin-top:20px;">
         <button class="btn-action btn-green" onclick="finishGame()">FINISH</button>
-        <button class="btn-action btn-red" onclick="resetGameData()">RESET GAME</button>
-        <button class="btn-action btn-cyan" onclick="downloadCSV()">DOWNLOAD CSV</button>
+        <button class="btn-action btn-red" onclick="resetGameData()">RESET</button>
       </div>
     </div>
 
@@ -317,9 +194,7 @@
   <div id="questionModal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">TANTANGAN FISIKA</div>
-      <div class="modal-body">
-        <div id="questionText"></div>
-      </div>
+      <div class="modal-body"><div id="questionText"></div></div>
       <div class="modal-options">
         <button onclick="selectAnswer('a', event)">A</button>
         <button onclick="selectAnswer('b', event)">B</button>
@@ -327,40 +202,34 @@
         <button onclick="selectAnswer('d', event)">D</button>
         <button onclick="selectAnswer('e', event)">E</button>
       </div>
-      <div class="modal-footer">
+      <div style="display:flex; justify-content:center; gap:10px; padding:20px;">
         <button class="btn-action btn-red" style="width:auto;" onclick="giveUpQuestion()">MENYERAH (-25)</button>
-        <button class="btn-action btn-green" style="width:auto;" onclick="submitAnswer()">SUBMIT JAWABAN</button>
+        <button class="btn-action btn-green" style="width:auto;" onclick="submitAnswer()">SUBMIT</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Input Angka -->
+  <!-- Modal Input Angka Sudoku -->
   <div id="numberModal" class="modal hidden">
-    <div class="modal-content" style="width: 400px;">
-      <div class="modal-header">Masukkan Angka</div>
-      <div class="modal-options" style="flex-wrap: wrap; padding-top: 25px;">
-        <button onclick="chooseNumber(1)" style="width: 60px; height: 60px; font-size: 20px;">1</button>
-        <button onclick="chooseNumber(2)" style="width: 60px; height: 60px; font-size: 20px;">2</button>
-        <button onclick="chooseNumber(3)" style="width: 60px; height: 60px; font-size: 20px;">3</button>
-        <button onclick="chooseNumber(4)" style="width: 60px; height: 60px; font-size: 20px;">4</button>
-        <button onclick="chooseNumber(5)" style="width: 60px; height: 60px; font-size: 20px;">5</button>
-        <button onclick="chooseNumber(6)" style="width: 60px; height: 60px; font-size: 20px;">6</button>
+    <div class="modal-content" style="width: 350px;">
+      <div class="modal-header">Pilih Angka</div>
+      <div class="modal-options">
+        <button onclick="chooseNumber(1)">1</button>
+        <button onclick="chooseNumber(2)">2</button>
+        <button onclick="chooseNumber(3)">3</button>
+        <button onclick="chooseNumber(4)">4</button>
+        <button onclick="chooseNumber(5)">5</button>
+        <button onclick="chooseNumber(6)">6</button>
       </div>
-      <div class="modal-footer" style="border-top:none; padding-top:0;">
-          <button class="btn-action btn-red" style="width:auto; padding: 5px 15px;" onclick="closeNumberModal()">BATAL</button>
-      </div>
+      <button class="btn-action btn-red" onclick="closeNumberModal()">BATAL</button>
     </div>
   </div>
 
   <div id="finishModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">GAME SELESAI!</div>
-      <div class="modal-body">
-        <h2 style="color: var(--neon-green); margin-top:0;">Skor Akhir: <span id="finishScoreDisplay">0</span></h2>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-action btn-red" style="width:auto;" onclick="closeFinishModal()">TUTUP</button>
-      </div>
+    <div class="modal-content" style="padding:20px; text-align:center;">
+        <h2 style="color:var(--neon-green)">GAME SELESAI!</h2>
+        <p>Skor Akhir Anda: <span id="finishScoreDisplay">0</span></p>
+        <button class="btn-action btn-cyan" onclick="location.reload()">MAIN LAGI</button>
     </div>
   </div>
 
@@ -372,46 +241,28 @@
       databaseURL: "https://fisdoku-multiplayer-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "fisdoku-multiplayer",
       storageBucket: "fisdoku-multiplayer.appspot.com",
-      messagingSenderId: "538766866299",
-      appId: "1:538766866299:web:0dcac6fab57feda27dafde",
-      measurementId: "G-4ERK2VJDQV"
+      appId: "1:538766866299:web:0dcac6fab57feda27dafde"
     };
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // --- DATA GAME ---
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReECKxgkKKOyE30wrZ1hI4a0Eo4naHaigZJ7EZe-KALKUsPJq_4pPPJc0eus6n_Sd5WVeijlYcKVBY/pub?output=csv";
     
-    // PERBAIKAN 1: Typo huruf 'a' diperbaiki
-    let soalMap = {};
-    let jawabanMap = {};
-    let sudokuSolution = [];
-    let prefilledCells = []; 
-    let soalCells = [];
-    let soalOrder = [];
-    let currentCell = null;
-    let score = 0;
-    let currentPlayer = "";
-    let timerInterval;
-    let totalSeconds = 0;
-    let selectedAnswer = "";
-    let gameFinished = false;
-    let correctQuestions = [];
+    let soalMap = {}, jawabanMap = {}, sudokuSolution = [];
+    let prefilledCells = [], soalCells = [], soalOrder = [];
+    let currentCell = null, score = 0, currentPlayer = "";
+    let timerInterval, totalSeconds = 0, selectedAnswer = "", gameFinished = false;
 
-    // --- LOGIC ---
+    // Listeners
     function initListeners() {
-      database.ref('leaderboard').on('value', snapshot => {
+      database.ref('leaderboard').on('value', snap => {
         const list = document.getElementById("leaderboardList");
         list.innerHTML = "";
-        const data = snapshot.val() || {};
+        const data = snap.val() || {};
         Object.values(data).sort((a,b) => b.score - a.score).slice(0, 5).forEach((e, i) => {
-          list.innerHTML += `<div class="leaderboard-item">${i+1}. ${e.name} <span style="float:right; color:var(--neon-green);">${e.score}</span></div>`;
+          list.innerHTML += `<div class="leaderboard-item">${i+1}. ${e.name} <span style="float:right;">${e.score}</span></div>`;
         });
-      });
-
-      database.ref('gameState').on('value', snap => {
-        if (!snap.exists() && currentPlayer !== "") window.location.reload();
       });
     }
     initListeners();
@@ -419,74 +270,42 @@
     async function startGame() {
       const name = document.getElementById("playerName").value.trim();
       if (!name) return alert("Masukkan nama!");
-
-      try {
-        const response = await fetch(SHEET_CSV_URL);
-        const csvText = await response.text();
-        
-        const rows = csvText.split('\n').slice(1); 
-
-        rows.forEach((row, index) => {
-              if (row.trim() === "") return;
-              
-              // Regex ini lebih aman untuk memisahkan koma di dalam link/teks
-              const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-              
-              if (columns && columns.length >= 2) {
-                  // Ambil kunci dari kolom terakhir
-                  let kunciRaw = columns[columns.length - 1].replace(/^"|"$/g, '').trim().toLowerCase();
-                  
-                  // Gabungkan kolom sisanya sebagai soal (link gambar)
-                  let soalRaw = columns.slice(0, columns.length - 1).join(',').replace(/^"|"$/g, '').trim();
-          
-                  soalMap[index] = soalRaw;
-                  jawabanMap[index] = kunciRaw;
-              }
-          });
-
-        if (Object.keys(soalMap).length === 0) {
-          throw new Error("Data soal kosong.");
-        }
-
-        proceedToGame(name);
-      } catch (error) {
-        console.error("Error Detail:", error);
-        alert("Gagal memuat soal. Pastikan link Google Sheets benar dan sudah di-Publish ke web.");
-      }
-    }
-
-    function proceedToGame(name) {
       currentPlayer = name;
       document.getElementById('playerInputBox').style.display = 'none';
 
-      database.ref('gameState').once('value').then(snap => {
-        if (snap.exists()) {
-          const data = snap.val();
-          sudokuSolution = data.sudokuSolution;
-          prefilledCells = data.prefilledCells || [];
-          soalCells = data.soalCells || [];
-          soalOrder = data.soalOrder || [];
-        } else {
-          sudokuSolution = generateSudoku();
-          prefilledCells = pickRandom(36, 11);
-          
-          // PERBAIKAN 2: Menyesuaikan jumlah kotak soal dengan ketersediaan data di Sheets
-          const jumlahSoalTersedia = Object.keys(soalMap).length;
-          const jumlahKotakSoal = Math.min(15, jumlahSoalTersedia); // Maksimal 15, atau seadanya soal
-          
-          soalCells = pickRandomExclude(36, jumlahKotakSoal, prefilledCells);
-          soalOrder = shuffle([...Array(jumlahSoalTersedia).keys()]).slice(0, jumlahKotakSoal);
-          
-          database.ref('gameState').set({ sudokuSolution, prefilledCells, soalCells, soalOrder });
-        }
-        renderGrid();
-        startTimer();
-      }).catch(err => {
-        alert("Error Database Firebase! Pastikan Rules Firebase sudah di-set ke 'true'.");
-        console.error(err);
-      });
+      try {
+        const res = await fetch(SHEET_CSV_URL);
+        const csv = await res.text();
+        const rows = csv.split('\n').slice(1);
+        rows.forEach((row, index) => {
+          if(!row.trim()) return;
+          const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if(cols.length >= 2) {
+            soalMap[index] = cols[0].replace(/^"|"$/g, '').trim();
+            jawabanMap[index] = cols[cols.length-1].replace(/^"|"$/g, '').trim().toLowerCase();
+          }
+        });
+
+        database.ref('gameState').once('value').then(snap => {
+          if (snap.exists()) {
+            const d = snap.val();
+            sudokuSolution = d.sudokuSolution;
+            prefilledCells = d.prefilledCells;
+            soalCells = d.soalCells;
+            soalOrder = d.soalOrder;
+          } else {
+            sudokuSolution = generateSudoku();
+            prefilledCells = pickRandom(36, 11);
+            soalCells = pickRandomExclude(36, 12, prefilledCells);
+            soalOrder = shuffle([...Array(Object.keys(soalMap).length).keys()]).slice(0, 12);
+            database.ref('gameState').set({ sudokuSolution, prefilledCells, soalCells, soalOrder });
+          }
+          renderGrid();
+          startTimer();
+        });
+      } catch (e) { alert("Gagal memuat data soal!"); }
     }
-    
+
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -498,7 +317,11 @@
           cell.textContent = sudokuSolution[Math.floor(i/6)][i%6];
           cell.classList.add('prefilled');
         } else {
-          cell.onclick = () => openModal(i, cell);
+          cell.onclick = () => {
+            if(gameFinished || cell.textContent !== "") return;
+            currentCell = cell;
+            document.getElementById('numberModal').classList.remove('hidden');
+          };
         }
         grid.appendChild(cell);
       }
@@ -510,59 +333,41 @@
         const moves = snap.val() || {};
         Object.entries(moves).forEach(([idx, move]) => {
           const cell = document.querySelector(`.cell[data-index="${idx}"]`);
-          if (cell && !cell.classList.contains('prefilled') && cell.textContent === "") {
+          if (cell && !cell.classList.contains('prefilled')) {
             cell.textContent = move.number;
             cell.classList.add(move.player === currentPlayer ? "answered-by-you" : "answered-by-other");
-          } else if (cell && cell.textContent !== "" && !moves[idx]) {
-              cell.textContent = "";
-              cell.classList.remove("answered-by-you", "answered-by-other");
           }
         });
       });
     }
 
-    function openModal(idx, cell) {
-      if (gameFinished || cell.textContent !== "") return;
-      currentCell = cell;
-      document.getElementById('numberModal').classList.remove('hidden');
-    }
-
+    // FUNGSI CHOOSE NUMBER YANG SUDAH DIPERBAIKI (TANPA ERROR SINTAKS)
     function chooseNumber(num) {
         const idx = parseInt(currentCell.dataset.index);
         const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
-    
-        // Tutup modal input angka
         closeNumberModal();
-    
-        // 1. Cek apakah angka Sudoku benar
+
         if (num === correct) {
-            // 2. Cek apakah kotak ini memiliki tantangan soal
             if (soalCells.includes(idx)) {
-                currentCell.textContent = num; // Tampilkan angka sementara
+                currentCell.textContent = num;
                 const sIdx = soalOrder[soalCells.indexOf(idx)];
                 let isiSoal = soalMap[sIdx];
-    
-                // Tampilkan Gambar jika isinya URL, jika bukan tampilkan Teks
+
                 if (isiSoal.includes("http")) {
                     document.getElementById('questionText').innerHTML = `
-                        <p style="margin-bottom:10px; color:var(--neon-cyan)">Perhatikan Gambar Berikut:</p>
-                        <img src="${isiSoal}" alt="Soal Fisika">
-                    `;
+                        <p style="margin-bottom:10px; color:var(--neon-cyan)">Perhatikan Gambar:</p>
+                        <img src="${isiSoal}" alt="Soal">`;
                 } else {
                     document.getElementById('questionText').innerHTML = `<p>${isiSoal}</p>`;
                 }
-    
                 document.getElementById('questionModal').classList.remove('hidden');
             } else {
-                // Jika tidak ada soal, langsung dapat poin
                 score += 25;
                 updateScore();
-                currentCell.textContent = num;
                 currentCell.classList.add("answered-by-you");
                 database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
             }
         } else {
-            // Jika angka Sudoku salah
             score -= 10;
             updateScore();
             alert("❌ Angka Sudoku Salah! Skor -10.");
@@ -573,16 +378,14 @@
       if (!selectedAnswer) return;
       const idx = parseInt(currentCell.dataset.index);
       const sIdx = soalOrder[soalCells.indexOf(idx)];
-
       if (selectedAnswer === jawabanMap[sIdx]) {
         score += 50;
-        correctQuestions.push(sIdx + 1);
         alert("✅ BENAR! +50 Poin.");
         currentCell.classList.add("answered-by-you");
         database.ref("answers/" + idx).set({ player: currentPlayer, number: currentCell.textContent });
       } else {
         score -= 25;
-        alert("❌ SALAH! -25 Poin. Kotak dikosongkan.");
+        alert("❌ SALAH! -25 Poin.");
         currentCell.textContent = "";
       }
       updateScore();
@@ -590,38 +393,21 @@
     }
 
     function giveUpQuestion() {
-      const idx = parseInt(currentCell.dataset.index);
       score -= 25;
       updateScore();
       currentCell.textContent = "";
-      alert("🏳️ Menyerah. Skor -25. Kotak dikosongkan.");
       closeQuestion();
     }
 
-    function closeQuestion() {
-      document.getElementById('questionModal').classList.add('hidden');
-      selectedAnswer = "";
-      document.querySelectorAll("#questionModal .modal-options button").forEach(b => {
-        b.style.background = "transparent"; b.style.color = "white";
-      });
-    }
-
-    function finishGame() {
-      gameFinished = true;
-      clearInterval(timerInterval);
-      database.ref('finalScores').push({
-        name: currentPlayer, score: score, 
-        time: document.getElementById('playerTimer').textContent, 
-        timestamp: Date.now(),
-        solvedSoal: correctQuestions.join(", ")
-      });
-      document.getElementById("finishScoreDisplay").textContent = score;
-      document.getElementById("finishModal").classList.remove("hidden");
+    function selectAnswer(choice, e) {
+      selectedAnswer = choice;
+      document.querySelectorAll(".modal-options button").forEach(b => b.style.background = "transparent");
+      e.target.style.background = "var(--neon-green)";
     }
 
     function updateScore() {
       document.getElementById('score').textContent = score;
-      if(currentPlayer) database.ref('leaderboard/'+currentPlayer).set({name:currentPlayer, score:score});
+      database.ref('leaderboard/'+currentPlayer).set({name:currentPlayer, score:score});
     }
 
     function startTimer() {
@@ -634,85 +420,30 @@
     }
 
     function generateSudoku() {
-      const base = [
-        [1, 2, 3, 4, 5, 6],
-        [4, 5, 6, 1, 2, 3],
-        [2, 3, 1, 5, 6, 4],
-        [5, 6, 4, 2, 3, 1],
-        [3, 1, 2, 6, 4, 5],
-        [6, 4, 5, 3, 1, 2]
-      ];
-
-      const mapping = shuffle([1, 2, 3, 4, 5, 6]);
-      let grid = base.map(row => row.map(val => mapping[val - 1]));
-
-      for (let i = 0; i < 6; i += 2) {
-        if (Math.random() > 0.5) {
-          [grid[i], grid[i + 1]] = [grid[i + 1], grid[i]];
-        }
-      }
-      
-      let blocks = [[grid[0], grid[1]], [grid[2], grid[3]], [grid[4], grid[5]]];
-      blocks = shuffle(blocks);
-      grid = [].concat(...blocks);
-
-      return grid;
+      const base = [[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,1,5,6,4],[5,6,4,2,3,1],[3,1,2,6,4,5],[6,4,5,3,1,2]];
+      const map = shuffle([1,2,3,4,5,6]);
+      return base.map(r => r.map(v => map[v-1]));
     }
 
-    function pickRandom(total, count) {
-      return shuffle([...Array(total).keys()]).slice(0, count);
-    }
-
-    function pickRandomExclude(total, count, exclude) {
-      return shuffle([...Array(total).keys()].filter(i => !exclude.includes(i))).slice(0, count);
-    }
-
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
+    function shuffle(a) {
+      for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        [a[i], a[j]] = [a[j], a[i]];
       }
-      return arr;
+      return a;
     }
 
-    function selectAnswer(choice, e) {
-      selectedAnswer = choice;
-      document.querySelectorAll("#questionModal .modal-options button").forEach(b => {
-        b.style.background = "transparent"; b.style.color = "white";
-      });
-      e.target.style.background = "var(--neon-green)";
-      e.target.style.color = "black";
-    }
-
-    function resetGameData() { if(confirm("🚨 Reset semua?")) database.ref().remove(); }
+    function pickRandom(t, c) { return shuffle([...Array(t).keys()]).slice(0, c); }
+    function pickRandomExclude(t, c, ex) { return shuffle([...Array(t).keys()].filter(i => !ex.includes(i))).slice(0, c); }
+    
     function closeNumberModal() { document.getElementById('numberModal').classList.add('hidden'); }
-    function closeFinishModal() { document.getElementById("finishModal").classList.add("hidden"); }
-
-    function downloadCSV() {
-      database.ref('finalScores').once('value').then(snap => {
-        if (!snap.exists()) return alert("Belum ada data.");
-        
-        let csv = "Nama,Skor,Waktu,Soal Benar,Tanggal\n";
-        const data = snap.val();
-
-        Object.values(data).forEach(e => {
-          let nama = e.name || "Anonymous";
-          let skor = e.score !== undefined ? e.score : 0;
-          let waktu = e.time || "00:00";
-          let daftarSoal = e.solvedSoal ? `"${e.solvedSoal}"` : "-";
-          let tanggal = e.timestamp ? new Date(e.timestamp).toLocaleString() : "-";
-          csv += `${nama},${skor},${waktu},${daftarSoal},${tanggal}\n`;
-        });
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `laporan_fisdoku_${Date.now()}.csv`;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
+    function closeQuestion() { document.getElementById('questionModal').classList.add('hidden'); selectedAnswer = ""; }
+    function finishGame() { 
+        gameFinished = true; clearInterval(timerInterval); 
+        document.getElementById("finishScoreDisplay").textContent = score;
+        document.getElementById("finishModal").classList.remove("hidden");
     }
+    function resetGameData() { if(confirm("Reset Game?")) database.ref().remove().then(() => location.reload()); }
   </script>
 </body>
 </html>
