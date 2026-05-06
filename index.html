@@ -72,6 +72,12 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
+    .sudoku-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .sudoku-grid {
       display: grid;
       grid-template-columns: repeat(6, 65px);
@@ -80,10 +86,12 @@
       background: var(--neon-blue);
       padding: 4px;
       border-radius: 8px;
+      box-shadow: 0 0 15px rgba(69, 162, 158, 0.5);
     }
 
     .cell {
-      width: 65px; height: 65px;
+      width: 65px;
+      height: 65px;
       background: var(--bg-color);
       color: white;
       text-align: center;
@@ -91,72 +99,186 @@
       font-size: 24px;
       font-weight: bold;
       cursor: pointer;
+      transition: all 0.3s ease;
       font-family: 'Orbitron', sans-serif;
     }
 
-    .cell.prefilled { background: #1a1a24; color: var(--neon-blue); cursor: default; }
-    .cell.answered-by-you { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
-    .cell.answered-by-other { color: var(--neon-yellow); background: rgba(255, 215, 0, 0.1); cursor: not-allowed; }
+    .cell:hover:not(.prefilled):not(.answered-by-other) {
+      background: rgba(102, 252, 241, 0.2);
+      box-shadow: inset 0 0 10px var(--neon-cyan);
+    }
+
+    .cell.prefilled {
+      background: #1a1a24;
+      color: var(--neon-blue);
+      cursor: default;
+    }
+
+    .cell.answered-by-you {
+      color: var(--neon-green);
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+
+    .cell.answered-by-other {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 8px var(--neon-yellow);
+      background: rgba(255, 215, 0, 0.1);
+      cursor: not-allowed;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
     .stat-box {
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid;
       padding: 15px;
+      font-weight: bold;
       border-radius: 8px;
       text-align: center;
-      margin-bottom: 15px;
+      font-size: 18px;
+      letter-spacing: 1px;
     }
-    .score-box { border-color: var(--neon-green); color: var(--neon-green); }
-    .timer-box { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+
+    .score-box { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,153,0.2); }
+    .timer-box { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 10px rgba(102,252,241,0.2); }
+
+    button {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
     .btn-action {
       padding: 10px 15px;
       border: none;
       width: 100%;
       margin-top: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 6px;
     }
-    .btn-cyan { border: 2px solid var(--neon-cyan); color: var(--neon-cyan); background: transparent; }
-    .btn-red { border: 2px solid var(--neon-red); color: var(--neon-red); background: transparent; }
-    .btn-green { border: 2px solid var(--neon-green); color: var(--neon-green); background: transparent; }
+
+    .btn-cyan { background: transparent; border: 2px solid var(--neon-cyan); color: var(--neon-cyan); }
+    .btn-cyan:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
+    
+    .btn-red { background: transparent; border: 2px solid var(--neon-red); color: var(--neon-red); }
+    .btn-red:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); }
+
+    .btn-green { background: transparent; border: 2px solid var(--neon-green); color: var(--neon-green); }
+    .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
+
+    .player-input {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      background: var(--panel-bg);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: 0 auto 30px auto;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .player-input input {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 1px solid var(--neon-blue);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .start-btn {
+      background: var(--neon-yellow);
+      color: #000;
+      border: none;
+      padding: 10px 25px;
+      box-shadow: 0 0 10px rgba(255,215,0,0.5);
+    }
 
     .modal {
-      position: fixed; top: 0; left: 0;
+      position: fixed;
+      top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.8);
-      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 999;
     }
-    .hidden { display: none; }
+
+    .modal.hidden { display: none; }
     
     .modal-content {
       background: var(--panel-bg);
       border: 1px solid var(--neon-cyan);
       border-radius: 12px;
-      width: 600px; max-width: 95%;
+      width: 600px;
+      max-width: 95%;
+      box-shadow: 0 0 30px rgba(102, 252, 241, 0.3);
+      animation: fadeIn 0.3s ease;
       color: white;
+      display: flex;
+      flex-direction: column;
     }
 
-    .modal-header { padding: 15px; text-align: center; border-bottom: 1px solid var(--neon-cyan); font-family: 'Orbitron'; }
-    .modal-body { padding: 20px; text-align: center; max-height: 60vh; overflow-y: auto; }
-    
-    /* CSS UNTUK GAMBAR SOAL */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      background: rgba(102, 252, 241, 0.1);
+      border-bottom: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      text-align: center;
+      font-weight: bold;
+      padding: 15px;
+      font-size: 20px;
+      font-family: 'Orbitron', sans-serif;
+    }
+
     #questionText img {
-        display: block;
-        margin: 0 auto 15px auto;
-        max-width: 100%;
-        height: auto;
-        border: 2px solid var(--neon-cyan);
-        border-radius: 8px;
+      display: block;
+      margin: 0 auto 15px auto;
+      max-width: 100%;       /* Gambar tidak akan lebih lebar dari modal */
+      height: auto;          /* Menjaga rasio gambar */
+      border-radius: 8px;    /* Agar sudut gambar tidak tajam */
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
     }
 
-    .modal-options { display: flex; justify-content: center; gap: 10px; padding: 20px; }
-    .modal-options button { width: 50px; height: 50px; font-weight: bold; cursor: pointer; }
-    
-    .player-input { text-align: center; margin-bottom: 20px; }
-    .player-input input { padding: 10px; border-radius: 5px; border: 1px solid var(--neon-blue); background: #000; color: #fff; }
+    .modal-body {
+      padding: 25px;
+      text-align: center; /* Ubah ke left agar soal panjang lebih enak dibaca */
+      font-size: 16px;
+      max-height: 60vh; /* Batasi tinggi maksimal 50% layar */
+      overflow-y: auto; /* Munculkan scrollbar jika teks terlalu panjang */
+      line-height: 1.6;
+    }
+
+    .modal-options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 0 25px 25px 25px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -167,7 +289,7 @@
 
   <div class="player-input" id="playerInputBox">
     <input type="text" id="playerName" placeholder="Masukkan Nama..." />
-    <button class="btn-action btn-green" style="width:auto;" onclick="startGame()">START GAME</button>
+    <button class="start-btn" onclick="startGame()">START GAME</button>
   </div>
 
   <div class="game-container">
@@ -176,11 +298,12 @@
       <div id="leaderboardList"></div>
     </div>
 
-    <div class="sudoku-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+    <div class="sudoku-wrapper">
       <div id="grid" class="sudoku-grid"></div>
-      <div style="display:flex; gap:10px; margin-top:20px;">
+      <div class="bottom-buttons" style="display:flex; gap:10px; width:100%; margin-top:20px;">
         <button class="btn-action btn-green" onclick="finishGame()">FINISH</button>
-        <button class="btn-action btn-red" onclick="resetGameData()">RESET</button>
+        <button class="btn-action btn-red" onclick="resetGameData()">RESET GAME</button>
+        <button class="btn-action btn-cyan" onclick="downloadCSV()">DOWNLOAD CSV</button>
       </div>
     </div>
 
@@ -194,7 +317,9 @@
   <div id="questionModal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">TANTANGAN FISIKA</div>
-      <div class="modal-body"><div id="questionText"></div></div>
+      <div class="modal-body">
+        <div id="questionText"></div>
+      </div>
       <div class="modal-options">
         <button onclick="selectAnswer('a', event)">A</button>
         <button onclick="selectAnswer('b', event)">B</button>
@@ -202,34 +327,40 @@
         <button onclick="selectAnswer('d', event)">D</button>
         <button onclick="selectAnswer('e', event)">E</button>
       </div>
-      <div style="display:flex; justify-content:center; gap:10px; padding:20px;">
+      <div class="modal-footer">
         <button class="btn-action btn-red" style="width:auto;" onclick="giveUpQuestion()">MENYERAH (-25)</button>
-        <button class="btn-action btn-green" style="width:auto;" onclick="submitAnswer()">SUBMIT</button>
+        <button class="btn-action btn-green" style="width:auto;" onclick="submitAnswer()">SUBMIT JAWABAN</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Input Angka Sudoku -->
+  <!-- Modal Input Angka -->
   <div id="numberModal" class="modal hidden">
-    <div class="modal-content" style="width: 350px;">
-      <div class="modal-header">Pilih Angka</div>
-      <div class="modal-options">
-        <button onclick="chooseNumber(1)">1</button>
-        <button onclick="chooseNumber(2)">2</button>
-        <button onclick="chooseNumber(3)">3</button>
-        <button onclick="chooseNumber(4)">4</button>
-        <button onclick="chooseNumber(5)">5</button>
-        <button onclick="chooseNumber(6)">6</button>
+    <div class="modal-content" style="width: 400px;">
+      <div class="modal-header">Masukkan Angka</div>
+      <div class="modal-options" style="flex-wrap: wrap; padding-top: 25px;">
+        <button onclick="chooseNumber(1)" style="width: 60px; height: 60px; font-size: 20px;">1</button>
+        <button onclick="chooseNumber(2)" style="width: 60px; height: 60px; font-size: 20px;">2</button>
+        <button onclick="chooseNumber(3)" style="width: 60px; height: 60px; font-size: 20px;">3</button>
+        <button onclick="chooseNumber(4)" style="width: 60px; height: 60px; font-size: 20px;">4</button>
+        <button onclick="chooseNumber(5)" style="width: 60px; height: 60px; font-size: 20px;">5</button>
+        <button onclick="chooseNumber(6)" style="width: 60px; height: 60px; font-size: 20px;">6</button>
       </div>
-      <button class="btn-action btn-red" onclick="closeNumberModal()">BATAL</button>
+      <div class="modal-footer" style="border-top:none; padding-top:0;">
+          <button class="btn-action btn-red" style="width:auto; padding: 5px 15px;" onclick="closeNumberModal()">BATAL</button>
+      </div>
     </div>
   </div>
 
   <div id="finishModal" class="modal hidden">
-    <div class="modal-content" style="padding:20px; text-align:center;">
-        <h2 style="color:var(--neon-green)">GAME SELESAI!</h2>
-        <p>Skor Akhir Anda: <span id="finishScoreDisplay">0</span></p>
-        <button class="btn-action btn-cyan" onclick="location.reload()">MAIN LAGI</button>
+    <div class="modal-content">
+      <div class="modal-header">GAME SELESAI!</div>
+      <div class="modal-body">
+        <h2 style="color: var(--neon-green); margin-top:0;">Skor Akhir: <span id="finishScoreDisplay">0</span></h2>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action btn-red" style="width:auto;" onclick="closeFinishModal()">TUTUP</button>
+      </div>
     </div>
   </div>
 
