@@ -270,6 +270,13 @@
       padding: 20px;
       border-top: 1px solid rgba(255,255,255,0.1);
     }
+
+    #questionText {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -522,13 +529,20 @@
       const idx = parseInt(currentCell.dataset.index);
       const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
 
-      if (num === correct) {
-        document.getElementById('numberModal').classList.add('hidden');
-        
-        if (soalCells.includes(idx)) {
+      if (soalCells.includes(idx)) {
           currentCell.textContent = num; 
           const sIdx = soalOrder[soalCells.indexOf(idx)];
-          document.getElementById('questionText').innerHTML = soalMap[sIdx];
+          
+          let isiSoal = soalMap[sIdx];
+          
+          // Deteksi otomatis jika isinya adalah URL (gambar)
+          if (isiSoal.startsWith("http")) {
+            document.getElementById('questionText').innerHTML = `<img src="${isiSoal}" style="max-width: 100%; max-height: 45vh; object-fit: contain; border-radius: 8px; display: block; margin: 0 auto;" alt="Soal Gambar">`;
+          } else {
+            // Jika isinya bukan link, tetap tampilkan sebagai teks biasa
+            document.getElementById('questionText').innerHTML = isiSoal;
+          }
+          
           document.getElementById('questionModal').classList.remove('hidden');
         } else {
           score += 25;
