@@ -50,7 +50,7 @@
 
     @media (min-width: 992px) {
       .game-container {
-        display: none;
+        display: grid;
         grid-template-columns: 250px 1fr 250px;
         align-items: start;
       }
@@ -283,11 +283,21 @@
       isModerator = (pass === MODERATOR_PASSWORD);
       playerAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
       
+      if (isModerator) {
+        database.ref('roomControl').set({ 
+          isStarted: false, 
+          isFinished: false, 
+          isReset: false 
+        });
+        database.ref('answers').remove();
+        database.ref('gameState').remove();
+      }
+      
       database.ref('players/' + name).set({ name, avatar: playerAvatar, isModerator });
       document.getElementById("authArea").style.display = "none";
       document.getElementById("lobbyArea").style.display = "block";
-      document.getElementById("myAvatarContainer").innerHTML = `<img src="${playerAvatar}" style="width:70px;"><br><b>${name}</b>`;
       if (isModerator) document.getElementById("modControls").style.display = "block";
+      document.getElementById("myAvatarContainer").innerHTML = `<img src="${playerAvatar}" style="width:70px;"><br><b>${name}</b>`;
       
       listenToGameEvents();
       listenToLobby();
@@ -328,6 +338,12 @@
     }
 
     async function proceedToGame() {
+      const snap = await database.ref('gameState').once('value');
+      const data = snap.val();
+      if (!data) {
+        console.log("Menunggu data game siap...");
+        return; 
+      }
       document.getElementById("lobbyArea").style.display = "none";
       document.getElementById("mainGameArea").style.display = isModerator ? "block" : "flex";
       if (isModerator) {
@@ -338,12 +354,11 @@
       } else {
         startTimer();
       }
-      const snap = await database.ref('gameState').once('value');
-      const data = snap.val();
       sudokuSolution = data.sudokuSolution;
       prefilledCells = data.prefilledCells;
       soalCells = data.soalCells;
       soalOrder = data.soalOrder;
+      
       await fetchSoal(); 
       renderGrid();
       initLeaderboard();
