@@ -39,13 +39,12 @@
       text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-blue);
     }
 
-    /* Layout Utama */
     .game-container {
       display: none; 
       grid-template-columns: 250px auto 250px;
       gap: 25px;
       align-items: start;
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -58,73 +57,39 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
-    /* Lobby & Input Area */
-    .auth-container {
-      max-width: 400px;
-      margin: 50px auto;
-      text-align: center;
-    }
-
-    .input-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-
+    .auth-container { max-width: 400px; margin: 50px auto; text-align: center; }
+    .input-group { margin-bottom: 15px; text-align: left; }
     .input-group label { display: block; margin-bottom: 5px; color: var(--neon-cyan); font-size: 14px; }
+    input { width: 100%; padding: 12px; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue); color: white; border-radius: 6px; outline: none; }
 
-    input {
-      width: 100%;
-      padding: 12px;
-      box-sizing: border-box;
-      background: rgba(0,0,0,0.5);
-      border: 1px solid var(--neon-blue);
-      color: white;
-      border-radius: 6px;
-      outline: none;
-    }
-
-    /* Lobby Waiting Screen */
-    #lobbyArea {
-      display: none;
-      text-align: center;
-      margin-top: 50px;
-    }
-
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid var(--neon-cyan);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 2s linear infinite;
-      margin: 20px auto;
-    }
-
+    #lobbyArea { display: none; text-align: center; margin-top: 50px; }
+    .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--neon-cyan); border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Sudoku Grid */
+    /* Fix Grid: Memastikan wrapper tidak melebar */
+    .sudoku-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .sudoku-grid {
       display: grid;
-      grid-template-columns: repeat(6, 65px);
-      grid-template-rows: repeat(6, 65px);
+      grid-template-columns: repeat(6, 60px);
+      grid-template-rows: repeat(6, 60px);
       gap: 4px;
       background: var(--neon-blue);
       padding: 4px;
       border-radius: 8px;
-      transition: opacity 0.3s;
-    }
-
-    .sudoku-grid.locked {
-      pointer-events: none !important;
-      opacity: 0.7;
+      width: fit-content;
     }
 
     .cell {
-      width: 65px; height: 65px;
+      width: 60px; height: 60px;
       background: var(--bg-color);
       color: white;
       text-align: center;
-      line-height: 65px;
+      line-height: 60px;
       font-size: 24px;
       font-weight: bold;
       cursor: pointer;
@@ -134,32 +99,16 @@
     .cell.prefilled { background: #1a1a24; color: var(--neon-blue); cursor: default; }
     .cell.answered-by-you { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
     .cell.answered-by-other { color: var(--neon-yellow); background: rgba(255, 215, 0, 0.1); cursor: not-allowed; }
+    .sudoku-grid.locked { pointer-events: none !important; opacity: 0.7; }
 
-    /* Buttons */
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: 0.3s;
-      border: none;
-      margin-top: 10px;
-    }
-
+    .btn { width: 100%; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; transition: 0.3s; border: none; margin-top: 10px; }
     .btn-primary { background: var(--neon-cyan); color: #000; }
     .btn-reset { border: 2px solid var(--neon-red); background: transparent; color: var(--neon-red); }
     .btn-csv { border: 2px solid var(--neon-blue); background: transparent; color: var(--neon-blue); }
-    .btn-primary:hover { box-shadow: 0 0 15px var(--neon-cyan); }
-    .btn-csv:hover { background: rgba(69, 162, 158, 0.2); }
 
-    /* Modal */
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 999; }
     .modal.hidden { display: none; }
-    .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 500px; padding: 20px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.2); }
-
-    /* Leaderboard */
+    .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 450px; padding: 25px; }
     .leaderboard-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;}
   </style>
 
@@ -170,7 +119,6 @@
 
   <div class="header">FISDOKU</div>
 
-  <!-- BAGIAN 1: AUTH / LOGIN -->
   <div id="authArea" class="auth-container panel">
     <h3 style="color: var(--neon-yellow)">MASUK GAME</h3>
     <div class="input-group">
@@ -178,33 +126,30 @@
       <input type="text" id="playerName" placeholder="Contoh: Budi">
     </div>
     <div class="input-group">
-      <label>Password Moderator (Opsional)</label>
-      <input type="password" id="modPass" placeholder="Kosongkan jika Anda Siswa">
+      <label>Password Moderator</label>
+      <input type="password" id="modPass" placeholder="Kosongkan jika Siswa">
     </div>
     <button class="btn btn-primary" onclick="handleJoin()">MASUK LOBBY</button>
   </div>
 
-  <!-- BAGIAN 2: LOBBY TUNGGU -->
   <div id="lobbyArea" class="panel auth-container">
     <h2 id="lobbyTitle">Menunggu Moderator...</h2>
     <div class="loader"></div>
-    <p id="playerCount">Game akan segera dimulai...</p>
+    <p id="playerCount">Siapkan diri Anda!</p>
     <div id="modControls" style="display: none;">
-        <button class="btn btn-primary" onclick="triggerStartGame()">MULAI GAME SEKARANG</button>
+        <button class="btn btn-primary" onclick="triggerStartGame()">MULAI GAME</button>
     </div>
   </div>
 
-  <!-- BAGIAN 3: GAMEPLAY -->
   <div id="mainGameArea" class="game-container">
-    <div id="leaderboard" class="panel">
-      <h3 style="font-family: 'Orbitron'; color: var(--neon-yellow); text-align:center; margin-top:0;">RANKING</h3>
+    <div class="panel">
+      <h3 style="font-family: 'Orbitron'; color: var(--neon-yellow); text-align:center;">RANKING</h3>
       <div id="leaderboardList"></div>
     </div>
 
     <div class="sudoku-wrapper">
       <div id="grid" class="sudoku-grid"></div>
       <div class="bottom-buttons" style="display:flex; gap:10px; width:100%; margin-top:20px;">
-        <!-- Hanya muncul untuk Moderator -->
         <button id="btnFinish" class="btn btn-primary" onclick="triggerFinishGame()" style="background: var(--neon-green); display:none;">SELESAI</button>
         <button id="btnReset" class="btn btn-reset" onclick="resetGameData()" style="display:none;">RESET GAME</button>
         <button id="btnDownload" class="btn btn-csv" onclick="downloadCSV()" style="display:none;">DOWNLOAD CSV</button>
@@ -223,11 +168,10 @@
     </div>
   </div>
 
-  <!-- MODAL INPUT ANGKA (PENGGANTI PROMPT) -->
   <div id="numberModal" class="modal hidden">
-    <div class="modal-content" style="max-width: 300px; text-align: center;">
-        <h3 style="color: var(--neon-cyan); margin-top:0;">PILIH ANGKA</h3>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;">
+    <div class="modal-content" style="max-width: 250px; text-align: center;">
+        <h3 style="color: var(--neon-cyan); margin-top:0;">ANGKA?</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0;">
             <button class="btn btn-csv" onclick="selectNumber(1)">1</button>
             <button class="btn btn-csv" onclick="selectNumber(2)">2</button>
             <button class="btn btn-csv" onclick="selectNumber(3)">3</button>
@@ -239,30 +183,23 @@
     </div>
   </div>
 
-  <!-- MODAL SOAL FISIKA -->
   <div id="questionModal" class="modal hidden">
     <div class="modal-content">
-        <h3 id="modalTitle" style="color: var(--neon-cyan); margin-top:0;">TANTANGAN FISIKA</h3>
-        <div id="questionText" style="margin: 20px 0; font-size:15px; line-height:1.5;"></div>
-        <div id="optionsArea" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
-        <div style="margin-top: 20px; text-align: right;">
-            <button class="btn btn-reset" style="width: auto; padding: 10px 20px;" onclick="closeModal('questionModal')">BATAL</button>
-        </div>
+        <h3 style="color: var(--neon-cyan); margin-top:0;">SOAL FISIKA</h3>
+        <div id="questionText" style="margin: 15px 0; font-size:14px;"></div>
+        <div id="optionsArea" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
     </div>
   </div>
 
-  <!-- MODAL FINAL LEADERBOARD -->
   <div id="finalModal" class="modal hidden">
     <div class="modal-content" style="text-align: center;">
-        <h2 style="color: var(--neon-green); font-family: 'Orbitron';">GAME SELESAI!</h2>
-        <p style="color: #ccc;">Berikut adalah perolehan skor akhir:</p>
-        <div id="finalLeaderboardList" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin: 20px 0; max-height: 200px; overflow-y: auto; text-align:left;"></div>
-        <button class="btn btn-primary" onclick="window.location.reload()">MAIN LAGI</button>
+        <h2 style="color: var(--neon-green); font-family: 'Orbitron';">FINAL SCORE</h2>
+        <div id="finalLeaderboardList" style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; margin: 15px 0; text-align:left;"></div>
+        <button class="btn btn-primary" onclick="window.location.reload()">KE MENU UTAMA</button>
     </div>
   </div>
 
   <script>
-    // --- KONFIGURASI ---
     const MODERATOR_PASSWORD = "fisdoku123"; 
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReECKxgkKKOyE30wrZ1hI4a0Eo4naHaigZJ7EZe-KALKUsPJq_4pPPJc0eus6n_Sd5WVeijlYcKVBY/pub?output=csv";
 
@@ -279,7 +216,6 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // --- STATE ---
     let isModerator = false;
     let currentPlayer = "";
     let score = 0;
@@ -291,66 +227,53 @@
     let jawabanMap = {};
     let soalCells = [];
     let soalOrder = [];
-    let myAnsweredSoal = []; // Lacak nomor soal yang dijawab benar
-    let currentSelectedCell = null; // Menyimpan cell yang sedang diklik
+    let myAnsweredSoal = [];
+    let currentSelectedCell = null;
 
-    // --- LOGIKA ROLE & LOBBY ---
     function handleJoin() {
       const name = document.getElementById("playerName").value.trim();
       const pass = document.getElementById("modPass").value.trim();
-      
-      if (!name) return alert("Nama harus diisi!");
-      
+      if (!name) return alert("Isi nama dulu!");
       currentPlayer = name;
       isModerator = (pass === MODERATOR_PASSWORD);
 
       document.getElementById("authArea").style.display = "none";
       document.getElementById("lobbyArea").style.display = "block";
-
       if (isModerator) {
-        document.getElementById("lobbyTitle").innerText = "Lobby Moderator";
+        document.getElementById("lobbyTitle").innerText = "MODERATOR LOBBY";
         document.getElementById("modControls").style.display = "block";
       }
-
       listenToGameEvents();
     }
 
     function listenToGameEvents() {
-      // Monitor Start Game
       database.ref('roomControl/isStarted').on('value', snap => {
         if (snap.val() === true) proceedToGame();
       });
-
-      // Monitor Finish Game
       database.ref('roomControl/isFinished').on('value', snap => {
         if (snap.val() === true) showFinalScreen();
       });
-
-      // Monitor Reset Game
+      // Listener Reset yang lebih pintar (membersihkan status reset agar tidak loop)
       database.ref('roomControl/isReset').on('value', snap => {
-        if (snap.val() === true) window.location.reload();
+        if (snap.val() === true) {
+            database.ref('roomControl/isReset').set(false); // Matikan trigger reset
+            window.location.reload();
+        }
       });
     }
 
     async function triggerStartGame() {
       if (!isModerator) return;
-      
       await fetchSoal();
-      
       const sudoku = generateSudoku();
       const prefilled = pickRandom(36, 11);
       const totalSoal = Math.min(15, Object.keys(soalMap).length);
       const sCells = pickRandomExclude(36, totalSoal, prefilled);
       const sOrder = shuffle([...Array(Object.keys(soalMap).length).keys()]).slice(0, totalSoal);
 
-      database.ref('gameState').set({
-        sudokuSolution: sudoku,
-        prefilledCells: prefilled,
-        soalCells: sCells,
-        soalOrder: sOrder
+      await database.ref('gameState').set({
+        sudokuSolution: sudoku, prefilledCells: prefilled, soalCells: sCells, soalOrder: sOrder
       });
-
-      // Hapus state finish/reset sebelumnya
       database.ref('roomControl').set({ isStarted: true, isFinished: false, isReset: false });
     }
 
@@ -358,15 +281,14 @@
       document.getElementById("lobbyArea").style.display = "none";
       document.getElementById("mainGameArea").style.display = "grid";
       
-      // Atur UI berdasarkan role
       if (isModerator) {
-        document.getElementById("sidePanel").style.display = "none"; // Hilangkan skor & timer
+        document.getElementById("sidePanel").style.display = "none";
         document.getElementById("btnFinish").style.display = "block";
         document.getElementById("btnReset").style.display = "block";
         document.getElementById("btnDownload").style.display = "block";
-        document.getElementById("mainGameArea").style.gridTemplateColumns = "1fr auto"; // Sesuaikan kolom
+        document.getElementById("mainGameArea").style.gridTemplateColumns = "1fr auto";
       } else {
-        startTimer(); // Hanya player yang ada timer
+        startTimer();
       }
       
       const snap = await database.ref('gameState').once('value');
@@ -382,7 +304,6 @@
       listenMoves();
     }
 
-    // --- LOGIKA UTAMA ---
     async function fetchSoal() {
         try {
             const res = await fetch(SHEET_CSV_URL);
@@ -395,7 +316,7 @@
                     jawabanMap[idx] = cols[cols.length-1].trim().toLowerCase();
                 }
             });
-        } catch (e) { console.log("Gagal muat soal!"); }
+        } catch (e) { console.error("Error CSV"); }
     }
 
     function renderGrid() {
@@ -404,41 +325,26 @@
       for (let i = 0; i < 36; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
-        cell.dataset.index = i;
+        cell.id = `cell-${i}`;
         if (prefilledCells.includes(i)) {
           cell.textContent = sudokuSolution[Math.floor(i/6)][i%6];
           cell.classList.add('prefilled');
-        } else {
-          // Moderator tidak bisa klik grid
-          if (!isModerator) {
-            cell.onclick = () => {
-                currentSelectedCell = i;
-                document.getElementById('numberModal').classList.remove('hidden');
-            };
-          }
+        } else if (!isModerator) {
+          cell.onclick = () => { currentSelectedCell = i; document.getElementById('numberModal').classList.remove('hidden'); };
         }
         grid.appendChild(cell);
       }
     }
 
-    // Fungsi Trigger Input Angka dari Modal Custom
     function selectNumber(num) {
         closeModal('numberModal');
-        if (currentSelectedCell === null) return;
-        
         const idx = currentSelectedCell;
         const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
-        
         if (parseInt(num) === correct) {
-            if (soalCells.includes(idx)) {
-                openQuestionModal(idx, num);
-            } else {
-                submitMove(idx, num, 25);
-            }
+            if (soalCells.includes(idx)) openQuestionModal(idx, num);
+            else submitMove(idx, num, 25);
         } else {
-            score -= 10;
-            updateScore();
-            alert("Salah angka Sudoku! -10 poin");
+            score -= 10; updateScore(); alert("Salah Angka! -10");
         }
     }
 
@@ -446,27 +352,17 @@
         const sIdx = soalOrder[soalCells.indexOf(idx)];
         const question = soalMap[sIdx];
         const modal = document.getElementById('questionModal');
-        const qText = document.getElementById('questionText');
+        document.getElementById('questionText').innerHTML = question.includes("http") ? `<img src="${question}" style="width:100%">` : question;
         const optArea = document.getElementById('optionsArea');
-        
-        qText.innerHTML = question.includes("http") ? `<img src="${question}" style="width:100%">` : question;
         optArea.innerHTML = '';
-        
         ['a','b','c','d','e'].forEach(opt => {
             const b = document.createElement('button');
-            b.className = 'btn btn-csv';
-            b.innerText = opt.toUpperCase();
+            b.className = 'btn btn-csv'; b.innerText = opt.toUpperCase();
             b.onclick = () => {
                 if (opt === jawabanMap[sIdx]) {
-                    alert("JAWABAN BENAR! +50 Poin");
-                    myAnsweredSoal.push(sIdx + 1); // Simpan nomor soal (index + 1)
-                    submitMove(idx, num, 50);
-                    modal.classList.add('hidden');
+                    myAnsweredSoal.push(sIdx + 1); submitMove(idx, num, 50); modal.classList.add('hidden');
                 } else {
-                    alert("JAWABAN SALAH! -25 Poin");
-                    score -= 25;
-                    updateScore();
-                    modal.classList.add('hidden');
+                    score -= 25; updateScore(); modal.classList.add('hidden'); alert("Salah! -25");
                 }
             };
             optArea.appendChild(b);
@@ -475,8 +371,7 @@
     }
 
     function submitMove(idx, num, points) {
-        score += points;
-        updateScore();
+        score += points; updateScore();
         database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
     }
 
@@ -484,11 +379,11 @@
       database.ref("answers").on("value", snap => {
         const moves = snap.val() || {};
         Object.entries(moves).forEach(([idx, m]) => {
-          const cell = document.querySelector(`.cell[data-index="${idx}"]`);
-          if (cell && cell.textContent === "") {
+          const cell = document.getElementById(`cell-${idx}`);
+          if (cell) {
             cell.textContent = m.number;
             cell.classList.add(m.player === currentPlayer ? "answered-by-you" : "answered-by-other");
-            cell.onclick = null; // Matikan klik kalau sudah terisi
+            cell.onclick = null;
           }
         });
       });
@@ -498,27 +393,19 @@
       database.ref('leaderboard').on('value', snap => {
         const list = document.getElementById("leaderboardList");
         const finalist = document.getElementById("finalLeaderboardList");
-        list.innerHTML = "";
-        finalist.innerHTML = "";
-        
+        list.innerHTML = ""; finalist.innerHTML = "";
         const data = Object.values(snap.val() || {}).sort((a,b) => b.score - a.score);
         data.forEach((e, i) => {
-          const htmlStr = `<div class="leaderboard-item"><span>${i+1}. ${e.name}</span> <span style="color:var(--neon-green); font-weight:bold;">${e.score}</span></div>`;
-          list.innerHTML += htmlStr;
-          finalist.innerHTML += htmlStr;
+          const html = `<div class="leaderboard-item"><span>${i+1}. ${e.name}</span><b>${e.score}</b></div>`;
+          list.innerHTML += html; finalist.innerHTML += html;
         });
       });
     }
 
     function updateScore() {
-      if(isModerator) return; // Moderator nggak masuk leaderboard
+      if(isModerator) return;
       document.getElementById('score').textContent = score;
-      // Push string soal yg berhasil dijawab agar bisa ditarik CSV
-      database.ref('leaderboard/'+currentPlayer).set({
-          name: currentPlayer, 
-          score: score,
-          answeredQuestions: myAnsweredSoal.join(' | ') 
-      });
+      database.ref('leaderboard/'+currentPlayer).set({ name: currentPlayer, score: score, answeredQuestions: myAnsweredSoal.join('|') });
     }
 
     function startTimer() {
@@ -530,53 +417,32 @@
       }, 1000);
     }
 
-    // --- MODERATOR ACTIONS & GAME CONTROL ---
     function triggerFinishGame() {
-        if (!isModerator) return;
-        if(confirm("Selesaikan permainan sekarang?")) {
-            database.ref('roomControl/isFinished').set(true);
-        }
+        if (isModerator && confirm("Selesai?")) database.ref('roomControl/isFinished').set(true);
     }
 
     function showFinalScreen() {
         clearInterval(timerInterval);
-        document.getElementById('grid').classList.add('locked'); // Kunci grid biar gak bisa diotak-atik lagi
-        
-        if(!isModerator) {
-            document.getElementById('finalModal').classList.remove('hidden');
-        }
+        document.getElementById('grid').classList.add('locked');
+        if(!isModerator) document.getElementById('finalModal').classList.remove('hidden');
     }
 
     function resetGameData() {
-        if (!isModerator) return;
-        if (confirm("🚨 RESET SEMUA DATA GAME (Leaderboard & Grid)?")) {
-            // Trigger auto-reload ke semua player
-            database.ref('roomControl/isReset').set(true).then(() => {
-                setTimeout(() => {
-                    database.ref().remove().then(() => window.location.reload());
-                }, 500); // Jeda dikit biar player sempat detect sinyal reset
-            });
+        if (isModerator && confirm("Reset Game?")) {
+            database.ref('roomControl/isReset').set(true); // Sinyal reset ke semua player
         }
     }
 
     function downloadCSV() {
-        if (!isModerator) return;
         database.ref('leaderboard').once('value', snap => {
-            let csv = "Nama Player,Total Skor,Nomor Soal Terjawab\n";
-            Object.values(snap.val() || {}).forEach(e => {
-                // Beri tanda petik ganda biar kalau ada koma/spasi aman di Excel
-                csv += `${e.name},${e.score},"${e.answeredQuestions || '-'}"\n`;
-            });
+            let csv = "Nama,Skor,Soal\n";
+            Object.values(snap.val() || {}).forEach(e => csv += `${e.name},${e.score},"${e.answeredQuestions || '-'}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `Rekap_FISDOKU_${new Date().getTime()}.csv`;
-            a.click();
+            a.href = URL.createObjectURL(blob); a.download = `FISDOKU_REKAP.csv`; a.click();
         });
     }
 
-    // --- HELPER ---
     function generateSudoku() {
       const base = [[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,1,5,6,4],[5,6,4,2,3,1],[3,1,2,6,4,5],[6,4,5,3,1,2]];
       const m = shuffle([1,2,3,4,5,6]);
@@ -585,7 +451,7 @@
     function shuffle(a) { for (let i=a.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
     function pickRandom(t, c) { return shuffle([...Array(t).keys()]).slice(0, c); }
     function pickRandomExclude(t, c, e) { return shuffle([...Array(t).keys()].filter(i => !e.includes(i))).slice(0, c); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); currentSelectedCell = null; }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
   </script>
 </body>
 </html>
