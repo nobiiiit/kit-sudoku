@@ -298,7 +298,7 @@
       document.getElementById("lobbyArea").style.display = "block";
       if (isModerator) document.getElementById("modControls").style.display = "block";
       document.getElementById("myAvatarContainer").innerHTML = `<img src="${playerAvatar}" style="width:70px;"><br><b>${name}</b>`;
-      
+      sendNotification(`🎮 ${name} bergabung ke lobby!`);
       listenToGameEvents();
       listenToLobby();
       listenNotifications();
@@ -526,6 +526,8 @@
     function submitMove(idx, num, pts) {
         score += pts; updateScore();
         database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
+        const type = pts > 25 ? "🧠" : "🔢";
+        sendNotification(`${type} ${currentPlayer} menjawab kotak ${idx + 1} (+${pts})`);
     }
 
     function updateScore() {
@@ -578,14 +580,19 @@
     function clearHighlight() { document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight-axis', 'highlight-match')); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     function sendNotification(msg) { database.ref('notifications').push({ text: msg, time: Date.now() }); }
+    let gameSessionStart = Date.now();
     function listenNotifications() {
         database.ref('notifications').limitToLast(5).on('child_added', snap => {
             const d = snap.val();
-            if (Date.now() - d.time < 10000) {
+            if (d.time > gameSessionStart - 5000) {
                 const area = document.getElementById('notifArea');
                 const t = document.createElement('div');
                 t.className = 'notif-toast'; t.innerText = d.text;
-                area.appendChild(t); setTimeout(() => t.remove(), 4000);
+                area.appendChild(t);
+                setTimeout(() => {
+                    t.style.opacity = '0';
+                    setTimeout(() => t.remove(), 500);
+                }, 4000);
             }
         });
     }
