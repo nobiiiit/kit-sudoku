@@ -57,6 +57,44 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
+    .avatar-md {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
+      margin-bottom: 10px;
+    }
+
+    .avatar-sm {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--neon-cyan);
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    #lobbyPlayerList {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .lobby-player-card {
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      width: 80px;
+      text-align: center;
+      font-size: 12px;
+    }
+
     .auth-container { max-width: 400px; margin: 50px auto; text-align: center; }
     .input-group { margin-bottom: 15px; text-align: left; }
     .input-group label { display: block; margin-bottom: 5px; color: var(--neon-cyan); font-size: 14px; }
@@ -133,9 +171,11 @@
   </div>
 
   <div id="lobbyArea" class="panel auth-container">
-    <h2 id="lobbyTitle">Menunggu Moderator...</h2>
+    <h2 id="lobbyTitle">Menunggu Game...</h2>
+    <div id="myAvatarContainer"></div>
     <div class="loader"></div>
-    <p id="playerCount">Siapkan diri Anda!</p>
+    <p id="playerCount" style="color: var(--neon-yellow); font-weight: bold;">0 Pemain Terhubung</p>
+    <div id="lobbyPlayerList"></div>
     <div id="modControls" style="display: none;">
         <button class="btn btn-primary" onclick="triggerStartGame()">MULAI GAME</button>
     </div>
@@ -229,6 +269,7 @@
     let soalOrder = [];
     let myAnsweredSoal = [];
     let currentSelectedCell = null;
+    let playerAvatar = "";
 
     function handleJoin() {
       const name = document.getElementById("playerName").value.trim();
@@ -236,14 +277,45 @@
       if (!name) return alert("Isi nama dulu!");
       currentPlayer = name;
       isModerator = (pass === MODERATOR_PASSWORD);
+      playerAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
+      database.ref('players/' + name).set({
+        name: name,
+        avatar: playerAvatar,
+        isModerator: isModerator
+      });
 
       document.getElementById("authArea").style.display = "none";
       document.getElementById("lobbyArea").style.display = "block";
+      document.getElementById("myAvatarContainer").innerHTML = `<img src="${playerAvatar}" class="avatar-md"><br><b>${name}</b>`;
       if (isModerator) {
         document.getElementById("lobbyTitle").innerText = "MODERATOR LOBBY";
         document.getElementById("modControls").style.display = "block";
       }
       listenToGameEvents();
+      listenToLobby();
+    }
+
+    function listenToLobby() {
+        database.ref('players').on('value', snap => {
+            const players = snap.val() || {};
+            const playerEntries = Object.values(players);
+            
+            // Update jumlah orang
+            document.getElementById("playerCount").innerText = `${playerEntries.length} Pemain Terhubung`;
+            
+            // Update daftar foto di lobby
+            const listContainer = document.getElementById("lobbyPlayerList");
+            listContainer.innerHTML = "";
+            
+            playerEntries.forEach(p => {
+                listContainer.innerHTML += `
+                    <div class="lobby-player-card">
+                        <img src="${p.avatar}" style="width:40px; height:40px; border-radius:50%">
+                        <div style="overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
+                    </div>
+                `;
+            });
+        });
     }
 
     let isInitialLoad = true;
@@ -398,7 +470,13 @@
         list.innerHTML = ""; finalist.innerHTML = "";
         const data = Object.values(snap.val() || {}).sort((a,b) => b.score - a.score);
         data.forEach((e, i) => {
-          const html = `<div class="leaderboard-item"><span>${i+1}. ${e.name}</span><b>${e.score}</b></div>`;
+          const html = `
+            <div class="leaderboard-item">
+            <span>
+              ${i+1}. <img src="${e.avatar || ''}" class="avatar-sm"> ${e.name}
+            </span> 
+              <b>${e.score}</b>
+            </div>`;
           list.innerHTML += html; finalist.innerHTML += html;
         });
       });
@@ -407,7 +485,9 @@
     function updateScore() {
       if(isModerator) return;
       document.getElementById('score').textContent = score;
-      database.ref('leaderboard/'+currentPlayer).set({ name: currentPlayer, score: score, answeredQuestions: myAnsweredSoal.join('|') });
+      database.ref('leaderboard/'+currentPlayer).set({ 
+        name: currentPlayer, score: score, avatar: playerAvatar,
+        answeredQuestions: myAnsweredSoal.join('|') });
     }
 
     function startTimer() {
@@ -435,6 +515,7 @@
                 // 1. Hapus semua data permainan
                 await database.ref('answers').remove();
                 await database.ref('leaderboard').remove();
+                await database.ref('players').remove();
                 await database.ref('gameState').remove();
     
                 // 2. Kirim sinyal reset "PULSA" (True lalu segera False)
