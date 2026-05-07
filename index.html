@@ -148,6 +148,30 @@
     .modal.hidden { display: none; }
     .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 450px; padding: 25px; }
     .leaderboard-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;}
+
+    .correct-glow {
+      animation: neon-pulse 0.6s ease-in-out;
+      border: 2px solid var(--neon-green) !important;
+      z-index: 10;
+    }
+
+    @keyframes neon-pulse {
+      0% { box-shadow: 0 0 5px var(--neon-green); transform: scale(1); }
+      50% { box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green); transform: scale(1.1); }
+      100% { box-shadow: 0 0 8px var(--neon-green); transform: scale(1); }
+    }
+
+    .wrong-shake {
+      animation: neon-shake 0.4s linear;
+      border: 2px solid var(--neon-red) !important;
+      box-shadow: 0 0 15px var(--neon-red);
+    }
+
+    @keyframes neon-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -271,8 +295,8 @@
     let currentSelectedCell = null;
     let playerAvatar = "";
 
-    const soundCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'); // Suara Ding
-    const soundWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+    const soundCorrect = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-funny-yay-6273.mp3'); // Suara Ding
+    const soundWrong = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-buzzer2-6109.mp3');
 
     function handleJoin() {
       const name = document.getElementById("playerName").value.trim();
@@ -419,10 +443,13 @@
         const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
         if (parseInt(num) === correct) {
             soundCorrect.play();
+            cell.classList.add('correct-glow');
             if (soalCells.includes(idx)) openQuestionModal(idx, num);
             else submitMove(idx, num, 25);
         } else {
             soundWrong.play();
+            cell.classList.add('wrong-shake');
+            setTimeout(() => cell.classList.remove('wrong-shake'), 400);
             score -= 10; updateScore(); alert("Salah Angka! -10");
         }
     }
@@ -438,11 +465,15 @@
             const b = document.createElement('button');
             b.className = 'btn btn-csv'; b.innerText = opt.toUpperCase();
             b.onclick = () => {
+                const cell = document.getElementById(`cell-${idx}`);
                 if (opt === jawabanMap[sIdx]) {
-                    soundCorrect.play(); myAnsweredSoal.push(sIdx + 1); 
+                    soundCorrect.play(); cell.classList.add('correct-glow');
+                    myAnsweredSoal.push(sIdx + 1); 
                     submitMove(idx, num, 50); modal.classList.add('hidden');
                 } else {
-                  soundWrong.play(); score -= 25; 
+                  soundWrong.play(); cell.classList.add('wrong-shake');
+                  setTimeout(() => cell.classList.remove('wrong-shake'), 400);
+                  score -= 25; 
                   updateScore(); modal.classList.add('hidden'); alert("Salah! -25");
                 }
             };
