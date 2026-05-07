@@ -60,10 +60,20 @@
     }
 
     /* --- HIGHLIGHT STYLES --- */
-    .cell.highlight-axis { background: rgba(69, 162, 158, 0.15) !important; }
+    .cell.highlight-axis { 
+        background: #161b22 !important; 
+        box-shadow: inset 0 0 20px rgba(102, 252, 241, 0.15); 
+        transition: background 0.1s;
+    }
     .cell.highlight-match { 
-        background: rgba(102, 252, 241, 0.3) !important; 
-        box-shadow: inset 0 0 10px var(--neon-cyan);
+        background: rgba(102, 252, 241, 0.25) !important; 
+        box-shadow: inset 0 0 15px var(--neon-cyan), 0 0 10px var(--neon-cyan);
+        color: #fff !important;
+        text-shadow: 0 0 5px #fff;
+    }
+    .cell.prefilled.highlight-axis, 
+    .cell.prefilled.highlight-match {
+        color: var(--neon-cyan) !important;
     }
 
     /* --- NOTIFICATION STYLES --- */
