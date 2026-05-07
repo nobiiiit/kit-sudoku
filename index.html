@@ -256,7 +256,6 @@
       // Listener Reset yang lebih pintar (membersihkan status reset agar tidak loop)
       database.ref('roomControl/isReset').on('value', snap => {
         if (snap.val() === true) {
-            database.ref('roomControl/isReset').set(false); // Matikan trigger reset
             window.location.reload();
         }
       });
@@ -427,9 +426,25 @@
         if(!isModerator) document.getElementById('finalModal').classList.remove('hidden');
     }
 
-    function resetGameData() {
-        if (isModerator && confirm("Reset Game?")) {
-            database.ref('roomControl/isReset').set(true); // Sinyal reset ke semua player
+    async function resetGameData() {
+        if (isModerator && confirm("Yakin ingin mereset game dan menghapus semua data?")) {
+            // 1. Hapus semua data riwayat permainan dari Firebase
+            await database.ref('answers').remove();
+            await database.ref('leaderboard').remove();
+            await database.ref('gameState').remove();
+    
+            // 2. Kembalikan roomControl ke kondisi awal (belum mulai, belum selesai)
+            // Dan berikan sinyal isReset: true agar layar player lain otomatis me-refresh
+            await database.ref('roomControl').set({
+                isStarted: false,
+                isFinished: false,
+                isReset: true
+            });
+    
+            // 3. Matikan sinyal reset setelah 2 detik agar room siap digunakan lagi
+            setTimeout(() => {
+                database.ref('roomControl/isReset').set(false);
+            }, 2000);
         }
     }
 
