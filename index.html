@@ -16,6 +16,7 @@
       --neon-red: #ff4655;
       --neon-green: #00ff99;
       --neon-yellow: #ffd700;
+      --neon-orange: #ff8c00;
     }
 
     body {
@@ -104,7 +105,6 @@
     .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--neon-cyan); border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Fix Grid: Memastikan wrapper tidak melebar */
     .sudoku-wrapper {
       display: flex;
       flex-direction: column;
@@ -148,6 +148,21 @@
     .modal.hidden { display: none; }
     .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 450px; padding: 25px; }
     .leaderboard-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;}
+
+    /* Combo Badge Style */
+    #comboText {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      margin-top: 5px;
+      display: block;
+      transition: 0.3s;
+    }
+    .combo-active {
+      color: var(--neon-orange);
+      text-shadow: 0 0 10px var(--neon-orange);
+      animation: bounce 0.5s infinite alternate;
+    }
+    @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
 
     .correct-glow {
       animation: neon-pulse 0.6s ease-in-out;
@@ -224,6 +239,8 @@
       <div class="panel" style="text-align: center; margin-bottom: 10px;">
         <div style="color:var(--neon-green)">SKOR</div>
         <div id="score" style="font-size: 32px; font-weight: bold;">0</div>
+        <!-- Tambahan UI Combo -->
+        <div id="comboText" style="display: none;">COMBO X<span id="comboVal">0</span></div>
       </div>
       <div class="panel" style="text-align: center;">
         <div style="color:var(--neon-cyan)">WAKTU</div>
@@ -283,6 +300,7 @@
     let isModerator = false;
     let currentPlayer = "";
     let score = 0;
+    let comboCount = 0; // TRACK COMBO
     let timerInterval;
     let totalSeconds = 0;
     let sudokuSolution = [];
@@ -295,7 +313,7 @@
     let currentSelectedCell = null;
     let playerAvatar = "";
 
-    const soundCorrect = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-funny-yay-6273.mp3'); // Suara Ding
+    const soundCorrect = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-funny-yay-6273.mp3'); 
     const soundWrong = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-buzzer2-6109.mp3');
 
     function handleJoin() {
@@ -326,14 +344,9 @@
         database.ref('players').on('value', snap => {
             const players = snap.val() || {};
             const playerEntries = Object.values(players);
-            
-            // Update jumlah orang
             document.getElementById("playerCount").innerText = `${playerEntries.length} Pemain Terhubung`;
-            
-            // Update daftar foto di lobby
             const listContainer = document.getElementById("lobbyPlayerList");
             listContainer.innerHTML = "";
-            
             playerEntries.forEach(p => {
                 listContainer.innerHTML += `
                     <div class="lobby-player-card">
@@ -353,7 +366,6 @@
       database.ref('roomControl/isFinished').on('value', snap => {
         if (snap.val() === true) showFinalScreen();
       });
-      // Listener Reset yang lebih pintar (membersihkan status reset agar tidak loop)
       database.ref('roomControl/isReset').on('value', snap => {
         const resetStatus = snap.val();
         if (resetStatus === true && !isInitialLoad) {
@@ -437,21 +449,62 @@
       }
     }
 
+    // LOGIKA POIN COMBO
+    function calculatePoints(isPhysicsQuestion) {
+        comboCount++; // Tambah combo karena benar
+        updateComboUI();
+
+        if (isPhysicsQuestion) {
+            // Jika soal fisika, base poin 50, combo nambahin extra
+            if (comboCount === 2) return 60;
+            if (comboCount >= 3) return 75;
+            return 50;
+        } else {
+            // Jika angka sudoku biasa sesuai request user
+            if (comboCount === 2) return 35;
+            if (comboCount >= 3) return 50;
+            return 25;
+        }
+    }
+
+    function updateComboUI() {
+        const comboTxt = document.getElementById('comboText');
+        const comboVal = document.getElementById('comboVal');
+        if (comboCount > 1) {
+            comboTxt.style.display = "block";
+            comboTxt.className = "combo-active";
+            comboVal.innerText = comboCount;
+        } else {
+            comboTxt.style.display = "none";
+        }
+    }
+
     function selectNumber(num) {
         closeModal('numberModal');
         const idx = currentSelectedCell;
         const cell = document.getElementById(`cell-${idx}`);
         const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
+        
         if (parseInt(num) === correct) {
             soundCorrect.play();
             cell.classList.add('correct-glow');
-            if (soalCells.includes(idx)) openQuestionModal(idx, num);
-            else submitMove(idx, num, 25);
+            setTimeout(() => cell.classList.remove('correct-glow'), 600);
+
+            if (soalCells.includes(idx)) {
+                openQuestionModal(idx, num);
+            } else {
+                let pts = calculatePoints(false);
+                submitMove(idx, num, pts);
+            }
         } else {
             soundWrong.play();
+            comboCount = 0; // RESET COMBO
+            updateComboUI();
             cell.classList.add('wrong-shake');
             setTimeout(() => cell.classList.remove('wrong-shake'), 400);
-            score -= 10; updateScore(); alert("Salah Angka! -10");
+            score -= 10; 
+            updateScore(); 
+            alert("Salah Angka! -10 (Combo Reset)");
         }
     }
 
@@ -468,15 +521,24 @@
             b.className = 'btn btn-csv'; b.innerText = opt.toUpperCase();
             b.onclick = () => {
                 if (opt === jawabanMap[sIdx]) {
-                    soundCorrect.play(); cell.classList.add('correct-glow');
+                    soundCorrect.play(); 
+                    cell.classList.add('correct-glow');
                     setTimeout(() => cell.classList.remove('correct-glow'), 600);
                     myAnsweredSoal.push(sIdx + 1); 
-                    submitMove(idx, num, 50); modal.classList.add('hidden');
+                    
+                    let pts = calculatePoints(true); // Hitung poin dengan combo
+                    submitMove(idx, num, pts); 
+                    modal.classList.add('hidden');
                 } else {
-                  soundWrong.play(); cell.classList.add('wrong-shake');
+                  soundWrong.play(); 
+                  comboCount = 0; // RESET COMBO
+                  updateComboUI();
+                  cell.classList.add('wrong-shake');
                   setTimeout(() => cell.classList.remove('wrong-shake'), 400);
                   score -= 25; 
-                  updateScore(); modal.classList.add('hidden'); alert("Salah! -25");
+                  updateScore(); 
+                  modal.classList.add('hidden'); 
+                  alert("Salah Soal! -25 (Combo Reset)");
                 }
             };
             optArea.appendChild(b);
@@ -552,26 +614,18 @@
     async function resetGameData() {
         if (isModerator && confirm("Yakin ingin mereset game dan menghapus semua data?")) {
             try {
-                // 1. Hapus semua data permainan
                 await database.ref('answers').remove();
                 await database.ref('leaderboard').remove();
                 await database.ref('players').remove();
                 await database.ref('gameState').remove();
-    
-                // 2. Kirim sinyal reset "PULSA" (True lalu segera False)
-                // Ini akan memicu reload di semua layar player lain
                 await database.ref('roomControl/isReset').set(true);
-                
-                // 3. Kembalikan status room ke awal
                 await database.ref('roomControl').set({
                     isStarted: false,
                     isFinished: false,
-                    isReset: false // Langsung dimatikan agar tidak loop
+                    isReset: false 
                 });
-    
                 alert("Game Berhasil di Reset!");
-                window.location.reload(); // Moderator reload sendiri
-                
+                window.location.reload(); 
             } catch (error) {
                 console.error("Gagal Reset:", error);
                 alert("Terjadi kesalahan saat reset.");
