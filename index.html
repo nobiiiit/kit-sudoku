@@ -440,6 +440,7 @@
     function selectNumber(num) {
         closeModal('numberModal');
         const idx = currentSelectedCell;
+        const cell = document.getElementById(`cell-${idx}`);
         const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
         if (parseInt(num) === correct) {
             soundCorrect.play();
@@ -458,6 +459,7 @@
         const sIdx = soalOrder[soalCells.indexOf(idx)];
         const question = soalMap[sIdx];
         const modal = document.getElementById('questionModal');
+        const cell = document.getElementById(`cell-${idx}`);
         document.getElementById('questionText').innerHTML = question.includes("http") ? `<img src="${question}" style="width:100%">` : question;
         const optArea = document.getElementById('optionsArea');
         optArea.innerHTML = '';
@@ -465,9 +467,9 @@
             const b = document.createElement('button');
             b.className = 'btn btn-csv'; b.innerText = opt.toUpperCase();
             b.onclick = () => {
-                const cell = document.getElementById(`cell-${idx}`);
                 if (opt === jawabanMap[sIdx]) {
                     soundCorrect.play(); cell.classList.add('correct-glow');
+                    setTimeout(() => cell.classList.remove('correct-glow'), 600);
                     myAnsweredSoal.push(sIdx + 1); 
                     submitMove(idx, num, 50); modal.classList.add('hidden');
                 } else {
