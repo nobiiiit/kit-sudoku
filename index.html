@@ -271,6 +271,9 @@
     let currentSelectedCell = null;
     let playerAvatar = "";
 
+    const soundCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'); // Suara Ding
+    const soundWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
     function handleJoin() {
       const name = document.getElementById("playerName").value.trim();
       const pass = document.getElementById("modPass").value.trim();
@@ -415,9 +418,11 @@
         const idx = currentSelectedCell;
         const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
         if (parseInt(num) === correct) {
+            soundCorrect.play();
             if (soalCells.includes(idx)) openQuestionModal(idx, num);
             else submitMove(idx, num, 25);
         } else {
+            soundWrong.play();
             score -= 10; updateScore(); alert("Salah Angka! -10");
         }
     }
@@ -434,9 +439,11 @@
             b.className = 'btn btn-csv'; b.innerText = opt.toUpperCase();
             b.onclick = () => {
                 if (opt === jawabanMap[sIdx]) {
-                    myAnsweredSoal.push(sIdx + 1); submitMove(idx, num, 50); modal.classList.add('hidden');
+                    soundCorrect.play(); myAnsweredSoal.push(sIdx + 1); 
+                    submitMove(idx, num, 50); modal.classList.add('hidden');
                 } else {
-                    score -= 25; updateScore(); modal.classList.add('hidden'); alert("Salah! -25");
+                  soundWrong.play(); score -= 25; 
+                  updateScore(); modal.classList.add('hidden'); alert("Salah! -25");
                 }
             };
             optArea.appendChild(b);
