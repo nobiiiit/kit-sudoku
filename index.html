@@ -466,16 +466,19 @@
         list.innerHTML = "";
         const badges = [];
 
-        // 1. Fast Solver (< 5 menit)
-        if (totalSeconds < 300) badges.push("⚡ Fast Solver");
-        
-        // 2. Perfect Physics (Minimal jawab 1 dan gak ada salah)
+        let maxQuestions = 0;
+        sortedLeaderboard.forEach(p => {
+            const count = p.answeredQuestions ? p.answeredQuestions.split('|').length : 0;
+            if (count > maxQuestions) maxQuestions = count;
+        });
+        const myQuestionCount = myAnsweredSoal.length;
+        // 1. Perfect Physics (Minimal jawab 1 dan gak ada salah)
         if (physicsCorrectCount > 0 && physicsWrongCount === 0) badges.push("🧠 Perfect Physics");
 
-        // 3. Combo Master (Pernah combo >= 3)
+        // 2. Combo Master (Pernah combo >= 3)
         if (maxComboEver >= 3) badges.push("🔥 Combo Master");
 
-        // 4. Top Rank (Posisi 1 di leaderboard)
+        // 3. Top Rank (Posisi 1 di leaderboard)
         if (sortedLeaderboard[0] && sortedLeaderboard[0].name === currentPlayer) badges.push("👑 Top Rank");
 
         if (badges.length === 0) {
@@ -527,7 +530,7 @@
         score += pts; updateScore();
         database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
         const type = pts > 25 ? "🧠" : "🔢";
-        sendNotification(`${type} ${currentPlayer} menjawab kotak ${idx + 1} (+${pts})`);
+        sendNotification(`${type} ${currentPlayer} menjawab kotak (+${pts})`);
     }
 
     function updateScore() {
