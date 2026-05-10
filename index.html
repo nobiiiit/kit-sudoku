@@ -121,6 +121,23 @@
       color: var(--neon-orange); 
     }
 
+    .btn-outline-cyan {
+      background: rgba(128, 209, 243, 0.1);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    .btn-outline-cyan:hover {
+      background: var(--neon-cyan);
+      color: #1a2a44;
+    }
+
+    .bottom-buttons .btn {
+      font-size: 11px;
+      padding: 8px;
+      border: 1px solid currentColor; /* Mengikuti warna teks tombol */
+    }
+
     /* --- NOTIF & MODAL --- */
     .notif-toast { 
       background: var(--panel-bg); 
@@ -140,6 +157,26 @@
       color: var(--neon-orange);
     }
 
+    .avatar-sm {
+      width: 24px;   /* Ukuran pas untuk list ranking */
+      height: 24px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 8px;
+      border: 1px solid var(--neon-cyan);
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid rgba(128, 209, 243, 0.1);
+      font-size: 13px;
+    }
+
+    
+
     /* --- ANIMATIONS --- */
     .correct-glow { border: 2px solid var(--neon-green) !important; box-shadow: 0 0 15px var(--neon-green) !important; }
     .wrong-shake { border: 2px solid var(--neon-red) !important; box-shadow: 0 0 15px var(--neon-red) !important; }
@@ -154,7 +191,7 @@
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 42, 68, 0.9); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
     .modal.hidden { display: none; }
     .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 100%; max-width: 450px; padding: 20px; }
-    .btn { width: 100%; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; transition: 0.3s; border: none; margin-top: 10px; }
+    .btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; border: 1px solid transparent; margin-top: 5px; }
     .cell.answered-by-you { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
     .cell.answered-by-other { color: var(--neon-orange); background: rgba(255, 149, 49, 0.1); }
   </style>
@@ -233,12 +270,12 @@
     <div class="modal-content" style="max-width: 280px; text-align: center;">
         <h3 style="color: var(--neon-cyan); margin-top:0;">PILIH ANGKA</h3>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0;">
-            <button class="btn btn-csv" onclick="selectNumber(1)">1</button>
-            <button class="btn btn-csv" onclick="selectNumber(2)">2</button>
-            <button class="btn btn-csv" onclick="selectNumber(3)">3</button>
-            <button class="btn btn-csv" onclick="selectNumber(4)">4</button>
-            <button class="btn btn-csv" onclick="selectNumber(5)">5</button>
-            <button class="btn btn-csv" onclick="selectNumber(6)">6</button>
+            <button class="btn btn-outline-cyan" onclick="selectNumber(1)">1</button>
+            <button class="btn btn-outline-cyan" onclick="selectNumber(2)">2</button>
+            <button class="btn btn-outline-cyan" onclick="selectNumber(3)">3</button>
+            <button class="btn btn-outline-cyan" onclick="selectNumber(4)">4</button>
+            <button class="btn btn-outline-cyan" onclick="selectNumber(5)">5</button>
+            <button class="btn btn-outline-cyan" onclick="selectNumber(6)">6</button>
         </div>
         <button class="btn btn-reset" onclick="closeModal('numberModal')">BATAL</button>
     </div>
@@ -465,12 +502,16 @@
         const sIdx = soalOrder[soalCells.indexOf(idx)];
         const question = soalMap[sIdx];
         const modal = document.getElementById('questionModal');
-        document.getElementById('questionText').innerHTML = question.includes("http") ? `<img src="${question}" style="width:100%">` : question;
+        document.getElementById('questionText').innerHTML = question.includes("http") 
+          ? `<img src="${question}" style="width:100%">` : question;
         const optArea = document.getElementById('optionsArea');
+        optArea.style.display = "grid";
+        optArea.style.gridTemplateColumns = "repeat(5, 1fr)"; 
+        optArea.style.gap = "8px";
         optArea.innerHTML = '';
         ['a','b','c','d','e'].forEach(opt => {
             const b = document.createElement('button');
-            b.className = 'btn btn-csv'; b.innerText = opt.toUpperCase();
+            b.className = 'btn btn-outline-cyan'; b.innerText = opt.toUpperCase();
             b.onclick = () => {
                 if (opt === jawabanMap[sIdx]) {
                     soundCorrect.play();
