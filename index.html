@@ -48,13 +48,19 @@
       margin: 0 auto;
     }
 
-    @media (min-width: 992px) {
+    @media (min-width: 991px) {
       .game-container {
         display: grid;
         grid-template-columns: 250px 1fr 250px;
         align-items: start;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
       }
       .header { font-size: 36px; letter-spacing: 6px; }
+      .main-content-wrapper {
+        grid-column: auto !important;
+      }
     }
 
     .panel {
@@ -166,31 +172,47 @@
     </div>
   </div>
 
-  <div id="mainGameArea" class="game-container">
-    <div id="sidePanel" class="side-stats" style="display: flex; gap: 10px;">
-      <div class="panel" style="flex: 1; text-align: center;">
-        <div style="color:var(--neon-green); font-size: 12px;">SKOR</div>
-        <div id="score" style="font-size: 24px; font-weight: bold;">0</div>
-        <div id="comboText" style="display: none; font-size: 10px; color: var(--neon-orange);">COMBO X<span id="comboVal">0</span></div>
+<div id="mainGameArea" class="game-container">
+    <div class="main-content-wrapper" style="grid-column: 2; display: flex; flex-direction: column; gap: 15px;">
+      
+      <div id="sidePanel" class="side-stats" style="display: flex; gap: 10px;">
+        <div class="panel" style="flex: 1; text-align: center;">
+          <div style="color:var(--neon-green); font-size: 12px;">SKOR</div>
+          <div id="score" style="font-size: 24px; font-weight: bold;">0</div>
+          <div id="comboText" style="display: none; font-size: 10px; color: var(--neon-orange);">COMBO X<span id="comboVal">0</span></div>
+        </div>
+        <div class="panel" style="flex: 1; text-align: center;">
+          <div style="color:var(--neon-cyan); font-size: 12px;">WAKTU</div>
+          <div id="playerTimer" style="font-size: 24px; font-weight: bold;">00:00</div>
+        </div>
       </div>
-      <div class="panel" style="flex: 1; text-align: center;">
-        <div style="color:var(--neon-cyan); font-size: 12px;">WAKTU</div>
-        <div id="playerTimer" style="font-size: 24px; font-weight: bold;">00:00</div>
-      </div>
-    </div>
 
-    <div class="sudoku-wrapper">
-      <div id="grid" class="sudoku-grid"></div>
-      <div class="bottom-buttons" style="display:flex; gap:10px; width:100%; max-width:400px; margin-top:15px;">
-        <button id="btnFinish" class="btn btn-primary" onclick="triggerFinishGame()" style="background: var(--neon-green); display:none;">SELESAI</button>
-        <button id="btnReset" class="btn btn-reset" onclick="resetGameData()" style="display:none; font-size: 10px; padding: 8px;">RESET</button>
-        <button id="btnDownload" class="btn btn-csv" onclick="downloadCSV()" style="display:none; font-size: 10px; padding: 8px;">REKAP</button>
+      <div class="sudoku-wrapper">
+        <div id="grid" class="sudoku-grid"></div>
+        <div class="bottom-buttons" style="display:flex; gap:10px; width:100%; max-width:400px; margin-top:15px;">
+          <button id="btnFinish" class="btn btn-primary" onclick="triggerFinishGame()" style="background: var(--neon-green); display:none;">SELESAI</button>
+          <button id="btnReset" class="btn btn-reset" onclick="resetGameData()" style="display:none; font-size: 10px; padding: 8px;">RESET</button>
+          <button id="btnDownload" class="btn btn-csv" onclick="downloadCSV()" style="display:none; font-size: 10px; padding: 8px;">REKAP</button>
+        </div>
       </div>
-    </div>
 
-    <div class="panel">
-      <h4 style="font-family: 'Orbitron'; color: var(--neon-yellow); text-align:center; margin: 0 0 10px 0;">RANKING</h4>
-      <div id="leaderboardList"></div>
+      <div class="panel scoring-rules" style="border-color: rgba(255, 215, 0, 0.3);">
+        <h4 style="font-family: 'Orbitron'; color: var(--neon-yellow); text-align:center; margin: 0 0 10px 0; font-size: 14px;">ATURAN SKOR</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px; text-transform: uppercase;">
+          <div>🔢 Angka Benar <span style="color:var(--neon-green); float:right;">+25</span></div>
+          <div>❌ Angka Salah <span style="color:var(--neon-red); float:right;">-10</span></div>
+          <div>🧠 Soal Benar <span style="color:var(--neon-green); float:right;">+50</span></div>
+          <div>⚠️ Soal Salah <span style="color:var(--neon-red); float:right;">-25</span></div>
+          <div>🔥 Kombo 2x <span style="color:var(--neon-orange); float:right;">+10</span></div>
+          <div>⚡ Kombo 3x <span style="color:var(--neon-cyan); float:right;">+25</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4 style="font-family: 'Orbitron'; color: var(--neon-cyan); text-align:center; margin: 0 0 10px 0; font-size: 14px;">RANKING</h4>
+        <div id="leaderboardList"></div>
+      </div>
+
     </div>
   </div>
 
