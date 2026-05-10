@@ -50,16 +50,18 @@
 
     @media (min-width: 991px) {
       .game-container {
-        display: grid;
-        grid-template-columns: 250px 1fr 250px;
-        align-items: start;
         display: flex;
         flex-direction: column;
-        padding: 10px;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
       }
       .header { font-size: 36px; letter-spacing: 6px; }
+      
       .main-content-wrapper {
-        grid-column: auto !important;
+        width: 100%;
+        max-width: 500px; /* Kita batasi lebarnya supaya gak terlalu lebar di monitor gede */
+        margin: 0 auto;
       }
     }
 
@@ -173,7 +175,7 @@
   </div>
 
 <div id="mainGameArea" class="game-container">
-    <div class="main-content-wrapper" style="grid-column: 2; display: flex; flex-direction: column; gap: 15px;">
+    <div class="main-content-wrapper" style="display: flex; flex-direction: column; gap: 15px;">
       
       <div id="sidePanel" class="side-stats" style="display: flex; gap: 10px;">
         <div class="panel" style="flex: 1; text-align: center;">
