@@ -511,20 +511,31 @@
         }
     }
 
-    function openQuestionModal(idx, num) {
+function openQuestionModal(idx, num) {
         const sIdx = soalOrder[soalCells.indexOf(idx)];
         const question = soalMap[sIdx];
         const modal = document.getElementById('questionModal');
-        document.getElementById('questionText').innerHTML = question.includes("http") 
-          ? `<img src="${question}" style="width:100%">` : question;
+        const questionDisplay = document.getElementById('questionText');
+
+        // --- Logika Baru Teks vs Gambar ---
+        if (question.match(/\.(jpeg|jpg|gif|png)$/) != null || question.includes("drive.google.com")) {
+            questionDisplay.innerHTML = `<img src="${question}" style="width:100%; border-radius:8px;">`;
+        } else {
+            // Menampilkan soal sebagai teks rata kiri agar rapi
+            questionDisplay.innerHTML = `<div style="text-align: left; white-space: pre-wrap; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">${question}</div>`;
+        }
+
         const optArea = document.getElementById('optionsArea');
         optArea.style.display = "grid";
         optArea.style.gridTemplateColumns = "repeat(auto-fit, minmax(50px, 1fr))";
         optArea.style.gap = "8px";
         optArea.innerHTML = '';
+        
         ['a','b','c','d','e'].forEach(opt => {
             const b = document.createElement('button');
-            b.className = 'btn btn-outline-cyan'; b.innerText = opt.toUpperCase();
+            b.className = 'btn btn-outline-cyan'; 
+            b.innerText = opt.toUpperCase();
+            
             b.onclick = () => {
                 if (opt === jawabanMap[sIdx]) {
                     soundCorrect.play();
@@ -541,7 +552,6 @@
                     comboCount = 0; updateComboUI();
                     score -= 25; updateScore();
                     modal.classList.add('hidden');
-                    alert("Jawaban Salah! -25");
                 }
             };
             optArea.appendChild(b);
