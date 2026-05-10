@@ -422,7 +422,7 @@
       if (!isModerator) return;
       await fetchSoal();
       const sudoku = generateSudoku();
-      const prefilled = pickRandom(36, 11);
+      const prefilled = pickRandom(36, 14);
       const totalSoal = Math.min(15, Object.keys(soalMap).length);
       const sCells = pickRandomExclude(36, totalSoal, prefilled);
       const sOrder = shuffle([...Array(Object.keys(soalMap).length).keys()]).slice(0, totalSoal);
