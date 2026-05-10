@@ -193,7 +193,20 @@
     .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 100%; max-width: 450px; padding: 20px; }
     .btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; border: 1px solid transparent; margin-top: 5px; }
     .cell.answered-by-you { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
-    .cell.answered-by-other { color: var(--neon-orange); background: rgba(255, 149, 49, 0.1); }
+    .cell.answered-by-other { 
+      color: var(--neon-orange); 
+      background: rgba(255, 149, 49, 0.1);
+      background: var(--panel-bg); 
+      border: 1px solid var(--neon-cyan); 
+      border-radius: 12px; 
+      width: 100%; 
+      max-width: 450px; 
+      padding: 20px; 
+      /* --- Tambahan Fix untuk HP --- */
+      max-height: 85vh; /* Maksimal tinggi modal adalah 85% dari tinggi layar */
+      overflow-y: auto; /* Munculkan scroll vertikal jika konten kepanjangan */
+      box-sizing: border-box;
+    }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -506,7 +519,7 @@
           ? `<img src="${question}" style="width:100%">` : question;
         const optArea = document.getElementById('optionsArea');
         optArea.style.display = "grid";
-        optArea.style.gridTemplateColumns = "repeat(5, 1fr)"; 
+        optArea.style.gridTemplateColumns = "repeat(auto-fit, minmax(50px, 1fr))";
         optArea.style.gap = "8px";
         optArea.innerHTML = '';
         ['a','b','c','d','e'].forEach(opt => {
