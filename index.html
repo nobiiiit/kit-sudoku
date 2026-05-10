@@ -1,1413 +1,716 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>FISDOKU - Professional Edition</title>
-
-  
-
+  <title>FLUIDOKU</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-
-
 <style>
-
     :root {
-
-      /* Palette dari Gambar */
-
       --bg-color: #1a2a44;       /* Navy gelap base */
-
       --panel-bg: rgba(43, 67, 109, 0.9); /* Navy dari palet (bar ke-3) */
-
       --neon-cyan: #80D1F3;      /* Biru muda (bar ke-1) */
-
       --neon-orange: #FF9531;    /* Orange (bar ke-2) */
-
       --neon-red: #F696A6;       /* Pink/Coral (bar ke-4) */
-
       --neon-green: #00AB52;     /* Hijau (bar ke-5) */
-
       --neon-blue: #4A90E2; 
-
       --neon-yellow: #FFD700;
-
       --text-light: #f0f4f8;
-
     }
-
-
-
+  
     body {
-
       font-family: 'Poppins', sans-serif;
-
       background-color: var(--bg-color);
-
       /* Gradient dibuat lebih berwarna biru navy agar tidak hitam suram */
-
       background-image: radial-gradient(circle at 50% 50%, #2B436D 0%, #162235 100%);
-
       color: var(--text-light);
-
       margin: 0;
-
       padding: 10px;
-
       min-height: 100vh;
-
     }
-
-
 
     .header {
-
       font-family: 'Orbitron', sans-serif;
-
       color: var(--neon-cyan);
-
       text-align: center;
-
       font-size: 28px;
-
       padding: 15px 0;
-
       letter-spacing: 4px;
-
       text-shadow: 0 0 15px var(--neon-cyan);
-
     }
-
-
 
     .panel {
-
       background: var(--panel-bg);
-
       backdrop-filter: blur(10px);
-
       border: 1px solid rgba(128, 209, 243, 0.3);
-
       border-radius: 12px;
-
       padding: 15px;
-
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
     }
-
-
 
     /* --- SUDOKU GRID --- */
-
     .sudoku-grid { 
-
       display: grid; 
-
       grid-template-columns: repeat(6, 1fr); 
-
       gap: 4px; 
-
       background: var(--neon-cyan); 
-
       padding: 4px; 
-
       border-radius: 8px; 
-
       width: 100%;
-
       max-width: 400px;
-
       box-shadow: 0 0 20px rgba(128, 209, 243, 0.2);
-
     }
-
-
 
     .cell { 
-
       aspect-ratio: 1/1;
-
       background: #253655; /* Warna kotak lebih terang dari bg */
-
       color: white; 
-
       display: flex;
-
       align-items: center;
-
       justify-content: center;
-
       font-size: 20px; 
-
       font-weight: bold; 
-
       cursor: pointer; 
-
       font-family: 'Orbitron', sans-serif; 
-
       transition: 0.2s; 
-
     }
-
-
 
     .cell:hover {
-
       background: #31466d;
-
     }
-
-
 
     .cell.prefilled { 
-
       background: #162235; 
-
       color: var(--neon-cyan); 
-
       cursor: default; 
-
     }
-
-
 
     .cell.highlight-axis { background: #3d5685 !important; }
-
     .cell.highlight-match { 
-
       background: rgba(128, 209, 243, 0.4) !important; 
-
       box-shadow: inset 0 0 10px var(--neon-cyan); 
-
     }
 
-
-
     /* --- BUTTONS --- */
-
     .btn-primary { 
-
       background: var(--neon-cyan); 
-
       color: #1a2a44; 
-
       box-shadow: 0 0 10px var(--neon-cyan);
-
     }
 
     .btn-primary:hover {
-
       background: #fff;
-
       box-shadow: 0 0 20px var(--neon-cyan);
-
     }
 
-
-
     .btn-reset { 
-
       border: 2px solid var(--neon-red); 
-
       background: transparent; 
-
       color: var(--neon-red); 
-
     }
 
     .btn-reset:hover {
-
       background: var(--neon-red);
-
       color: white;
-
     }
-
-
 
     .btn-csv { 
-
       border: 2px solid var(--neon-orange); 
-
       background: transparent; 
-
       color: var(--neon-orange); 
-
     }
-
-
 
     .btn-outline-cyan {
-
       background: rgba(128, 209, 243, 0.1);
-
       border: 1px solid var(--neon-cyan);
-
       color: var(--neon-cyan);
-
     }
-
-
 
     .btn-outline-cyan:hover {
-
       background: var(--neon-cyan);
-
       color: #1a2a44;
-
     }
-
-
 
     .bottom-buttons .btn {
-
       font-size: 11px;
-
       padding: 8px;
-
       border: 1px solid currentColor; /* Mengikuti warna teks tombol */
-
     }
-
-
 
     /* --- NOTIF & MODAL --- */
-
     .notif-toast { 
-
       background: var(--panel-bg); 
-
       border-left: 4px solid var(--neon-cyan); 
-
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-
     }
-
-
 
     input {
-
       background: #162235 !important;
-
       border: 1px solid var(--neon-blue) !important;
-
       color: white !important;
-
     }
-
-
 
     .achievement-badge {
-
       border: 1px solid var(--neon-orange);
-
       background: rgba(255, 149, 49, 0.1);
-
       color: var(--neon-orange);
-
     }
-
-
 
     .avatar-sm {
-
       width: 24px;   /* Ukuran pas untuk list ranking */
-
       height: 24px;
-
       border-radius: 50%;
-
       vertical-align: middle;
-
       margin-right: 8px;
-
       border: 1px solid var(--neon-cyan);
-
     }
-
-
 
     .leaderboard-item {
-
       display: flex;
-
       justify-content: space-between;
-
       align-items: center;
-
       padding: 8px;
-
       border-bottom: 1px solid rgba(128, 209, 243, 0.1);
-
       font-size: 13px;
-
     }
-
-
-
-    
-
-
 
     /* --- ANIMATIONS --- */
-
-    .correct-glow { border: 2px solid var(--neon-green) !important; box-shadow: 0 0 15px var(--neon-green) !important; }
-
-    .wrong-shake { border: 2px solid var(--neon-red) !important; box-shadow: 0 0 15px var(--neon-red) !important; }
-
-
+    .correct-glow { 
+      border: 2px solid var(--neon-green) !important; 
+      box-shadow: 0 0 15px var(--neon-green) !important; 
+    }
+    .wrong-shake { 
+      border: 2px solid var(--neon-red) !important; 
+      box-shadow: 0 0 15px var(--neon-red) !important; 
+    }
 
     /* Layouting Tetap Sama */
-
-    .game-container { display: none; flex-direction: column; gap: 15px; max-width: 1200px; margin: 0 auto; }
-
+    .game-container { display: none; flex-direction: 
+      column; gap: 15px; max-width: 1200px; margin: 0 auto; 
+      }
     @media (min-width: 991px) {
-
-      .game-container { flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-
+      .game-container { flex-direction: column; align-items: 
+        center; justify-content: center; padding: 20px; 
+      }
       .main-content-wrapper { width: 100%; max-width: 500px; margin: 0 auto; }
-
-    }
-
     .sudoku-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; }
-
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 42, 68, 0.9); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
-
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(26, 42, 68, 0.9); display: flex; align-items: 
+      center; justify-content: center; z-index: 999; padding: 20px; 
+    }
     .modal.hidden { display: none; }
-
-    .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); border-radius: 12px; width: 100%; max-width: 450px; padding: 20px; }
-
-    .btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; border: 1px solid transparent; margin-top: 5px; }
-
+    .modal-content { background: var(--panel-bg); border: 1px solid var(--neon-cyan); 
+      border-radius: 12px; width: 100%; max-width: 450px; padding: 20px; 
+    }
+    .btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; 
+      cursor: pointer; transition: 0.3s; border: 1px solid transparent; margin-top: 5px; 
+    }
     .cell.answered-by-you { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
-
     .cell.answered-by-other { color: var(--neon-orange); background: rgba(255, 149, 49, 0.1); }
-
   </style>
 
-
-
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
 </head>
-
+  
 <body>
-
-
-
   <div class="header">FISDOKU</div>
-
-
-
   <div id="notifArea"></div>
-
-
-
   <div id="authArea" class="panel" style="max-width: 400px; margin: 20px auto; text-align: center;">
-
-    <h3 style="color: var(--neon-yellow)">MASUK GAME</h3>
-
-    <input type="text" id="playerName" placeholder="Nama Anda" style="margin-bottom:10px; padding:12px; width:100%; box-sizing:border-box; background:#000; border:1px solid var(--neon-blue); color:#fff; border-radius:6px;">
-
-    <input type="password" id="modPass" placeholder="Password Moderator (Opsional)" style="margin-bottom:15px; padding:12px; width:100%; box-sizing:border-box; background:#000; border:1px solid var(--neon-blue); color:#fff; border-radius:6px;">
-
-    <button class="btn btn-primary" onclick="handleJoin()">MASUK LOBBY</button>
-
+    <h3 style="color: var(--neon-yellow)">MASUK PERMAINAN</h3>
+    <input type="text" id="playerName" placeholder="Nama Anda" style="margin-bottom:10px; 
+      padding:12px; width:100%; box-sizing:border-box; background:#000; 
+      border:1px solid var(--neon-blue); color:#fff; border-radius:6px;">
+    <input type="password" id="modPass" placeholder="Password Moderator (Opsional)" 
+      style="margin-bottom:15px; padding:12px; width:100%; box-sizing:border-box; 
+      background:#000; border:1px solid var(--neon-blue); color:#fff; border-radius:6px;">
+    <button class="btn btn-primary" onclick="handleJoin()">MASUK PERMAINAN</button>
   </div>
-
-
 
   <div id="lobbyArea" class="panel" style="display: none; max-width: 400px; margin: 20px auto; text-align: center;">
-
-    <h2 id="lobbyTitle">Lobby</h2>
-
+    <h2 id="lobbyTitle">Ruang Tunggu</h2>
     <div id="myAvatarContainer" style="margin-bottom:15px;"></div>
-
-    <div id="playerCount" style="color: var(--neon-yellow); font-weight: bold; margin-bottom:10px;">0 Pemain Terhubung</div>
-
-    <div id="lobbyPlayerList" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom:20px;"></div>
-
+    <div id="playerCount" style="color: var(--neon-yellow); font-weight: bold; 
+      margin-bottom:10px;">0 Pemain Terhubung</div>
+    <div id="lobbyPlayerList" style="display: flex; flex-wrap: wrap; 
+      justify-content: center; gap: 10px; margin-bottom:20px;"></div>
     <div id="modControls" style="display: none;">
-
-        <button class="btn btn-primary" onclick="triggerStartGame()">MULAI GAME</button>
-
+        <button class="btn btn-primary" onclick="triggerStartGame()">MULAI PERMAINAN</button>
     </div>
-
   </div>
-
-
 
 <div id="mainGameArea" class="game-container">
-
     <div class="main-content-wrapper" style="display: flex; flex-direction: column; gap: 15px;">
-
-      
-
       <div id="sidePanel" class="side-stats" style="display: flex; gap: 10px;">
-
         <div class="panel" style="flex: 1; text-align: center;">
-
           <div style="color:var(--neon-green); font-size: 12px;">SKOR</div>
-
           <div id="score" style="font-size: 24px; font-weight: bold;">0</div>
-
-          <div id="comboText" style="display: none; font-size: 10px; color: var(--neon-orange);">COMBO X<span id="comboVal">0</span></div>
-
+          <div id="comboText" style="display: none; font-size: 10px; color: var(--neon-orange);">KOMBO X<span id="comboVal">0</span></div>
         </div>
-
         <div class="panel" style="flex: 1; text-align: center;">
-
           <div style="color:var(--neon-cyan); font-size: 12px;">WAKTU</div>
-
           <div id="playerTimer" style="font-size: 24px; font-weight: bold;">00:00</div>
-
         </div>
-
       </div>
-
-
 
       <div class="sudoku-wrapper">
-
         <div id="grid" class="sudoku-grid"></div>
-
         <div class="bottom-buttons" style="display:flex; gap:10px; width:100%; max-width:400px; margin-top:15px;">
-
-          <button id="btnFinish" class="btn btn-primary" onclick="triggerFinishGame()" style="background: var(--neon-green); display:none;">SELESAI</button>
-
-          <button id="btnReset" class="btn btn-reset" onclick="resetGameData()" style="display:none; font-size: 10px; padding: 8px;">RESET</button>
-
-          <button id="btnDownload" class="btn btn-csv" onclick="downloadCSV()" style="display:none; font-size: 10px; padding: 8px;">REKAP</button>
-
+          <button id="btnFinish" class="btn btn-primary" onclick="triggerFinishGame()" 
+            style="background: var(--neon-green); display:none;">SELESAI</button>
+          <button id="btnReset" class="btn btn-reset" onclick="resetGameData()" 
+            style="display:none; font-size: 10px; padding: 8px;">RESET</button>
+          <button id="btnDownload" class="btn btn-csv" onclick="downloadCSV()" 
+            style="display:none; font-size: 10px; padding: 8px;">REKAP</button>
         </div>
-
       </div>
-
-
 
       <div class="panel scoring-rules" style="border-color: rgba(255, 215, 0, 0.3);">
-
-        <h4 style="font-family: 'Orbitron'; color: var(--neon-yellow); text-align:center; margin: 0 0 10px 0; font-size: 14px;">ATURAN SKOR</h4>
-
+        <h4 style="font-family: 'Orbitron'; color: var(--neon-yellow); text-align:center; 
+          margin: 0 0 10px 0; font-size: 14px;">ATURAN SKOR</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px; text-transform: uppercase;">
-
           <div>🔢 Angka Benar <span style="color:var(--neon-green); float:right;">+25</span></div>
-
           <div>❌ Angka Salah <span style="color:var(--neon-red); float:right;">-10</span></div>
-
           <div>🧠 Soal Benar <span style="color:var(--neon-green); float:right;">+50</span></div>
-
           <div>⚠️ Soal Salah <span style="color:var(--neon-red); float:right;">-25</span></div>
-
           <div>🔥 Kombo 2x <span style="color:var(--neon-orange); float:right;">+10</span></div>
-
           <div>⚡ Kombo 3x <span style="color:var(--neon-cyan); float:right;">+25</span></div>
-
         </div>
-
       </div>
-
-
 
       <div class="panel">
-
-        <h4 style="font-family: 'Orbitron'; color: var(--neon-cyan); text-align:center; margin: 0 0 10px 0; font-size: 14px;">RANKING</h4>
-
+        <h4 style="font-family: 'Orbitron'; color: var(--neon-cyan); text-align:center; 
+          margin: 0 0 10px 0; font-size: 14px;">PERINGKAT</h4>
         <div id="leaderboardList"></div>
-
       </div>
-
-
-
     </div>
-
   </div>
-
-
 
   <div id="numberModal" class="modal hidden">
-
     <div class="modal-content" style="max-width: 280px; text-align: center;">
-
         <h3 style="color: var(--neon-cyan); margin-top:0;">PILIH ANGKA</h3>
-
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0;">
-
             <button class="btn btn-outline-cyan" onclick="selectNumber(1)">1</button>
-
             <button class="btn btn-outline-cyan" onclick="selectNumber(2)">2</button>
-
             <button class="btn btn-outline-cyan" onclick="selectNumber(3)">3</button>
-
             <button class="btn btn-outline-cyan" onclick="selectNumber(4)">4</button>
-
             <button class="btn btn-outline-cyan" onclick="selectNumber(5)">5</button>
-
             <button class="btn btn-outline-cyan" onclick="selectNumber(6)">6</button>
-
         </div>
-
         <button class="btn btn-reset" onclick="closeModal('numberModal')">BATAL</button>
-
     </div>
-
   </div>
-
-
 
   <div id="questionModal" class="modal hidden">
-
     <div class="modal-content">
-
         <h3 style="color: var(--neon-cyan); margin-top:0; font-size: 18px;">SOAL FISIKA</h3>
-
         <div id="questionText" style="margin: 15px 0; font-size:14px; line-height: 1.5;"></div>
-
         <div id="optionsArea" style="display: grid; grid-template-columns: 1fr; gap: 8px;"></div>
-
     </div>
-
   </div>
-
-
 
   <div id="finalModal" class="modal hidden">
-
     <div class="modal-content" style="text-align: center;">
-
-        <h2 style="color: var(--neon-green); font-family: 'Orbitron'; margin-bottom: 5px;">GAME SELESAI</h2>
-
-        
-
+        <h2 style="color: var(--neon-green); font-family: 'Orbitron'; margin-bottom: 5px;">GAME OVER</h2>
         <div id="achievementArea" style="margin-bottom: 15px;">
-
            <div style="color: var(--neon-yellow); font-size: 12px; margin-bottom: 5px;">YOUR ACHIEVEMENTS:</div>
-
            <div id="achievementList"></div>
-
         </div>
-
-
-
         <div id="finalLeaderboardList" style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin: 15px 0; text-align:left;"></div>
-
         <button class="btn btn-primary" onclick="window.location.reload()">KE MENU UTAMA</button>
-
     </div>
-
   </div>
-
-
-
+  
   <script>
-
     // --- KONFIGURASI (KEEPS ORIGINAL) ---
-
-    const MODERATOR_PASSWORD = "fisdoku123"; 
-
+    const MODERATOR_PASSWORD = "fluidoku"; 
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReECKxgkKKOyE30wrZ1hI4a0Eo4naHaigZJ7EZe-KALKUsPJq_4pPPJc0eus6n_Sd5WVeijlYcKVBY/pub?output=csv";
-
-
-
     const firebaseConfig = {
-
       apiKey: "AIzaSyDRb1bnNWXp-0L1nzvxJgUCVhTGwAojK38",
-
       authDomain: "fisdoku-multiplayer.firebaseapp.com",
-
       databaseURL: "https://fisdoku-multiplayer-default-rtdb.asia-southeast1.firebasedatabase.app",
-
       projectId: "fisdoku-multiplayer",
-
       storageBucket: "fisdoku-multiplayer.appspot.com",
-
       messagingSenderId: "538766866299",
-
       appId: "1:538766866299:web:0dcac6fab57feda27dafde"
-
     };
 
-
-
     firebase.initializeApp(firebaseConfig);
-
     const database = firebase.database();
 
-
-
     // --- STATE GAME ---
-
     let isModerator = false;
-
     let currentPlayer = "";
-
     let score = 0;
-
     let comboCount = 0;
-
     let timerInterval;
-
     let totalSeconds = 0;
-
     let sudokuSolution = [];
-
     let prefilledCells = [];
-
     let soalMap = {};
-
     let jawabanMap = {};
-
     let soalCells = [];
-
     let soalOrder = [];
-
     let myAnsweredSoal = [];
-
     let currentSelectedCell = null;
-
     let playerAvatar = "";
 
-
-
     // --- ACHIEVEMENT TRACKERS ---
-
     let physicsWrongCount = 0;
-
     let physicsCorrectCount = 0;
-
     let maxComboEver = 0;
-
-
-
     const soundCorrect = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-funny-yay-6273.mp3'); 
-
     const soundWrong = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-buzzer2-6109.mp3');
 
-
-
     // --- LOGIKA JOIN & LOBBY ---
-
     function handleJoin() {
-
       const name = document.getElementById("playerName").value.trim();
-
       const pass = document.getElementById("modPass").value.trim();
-
       if (!name) return alert("Isi nama dulu!");
-
       currentPlayer = name;
-
       isModerator = (pass === MODERATOR_PASSWORD);
-
       playerAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
 
-      
-
       if (isModerator) {
-
         database.ref('roomControl').set({ 
-
           isStarted: false, 
-
           isFinished: false, 
-
           isReset: false 
-
         });
-
         database.ref('answers').remove();
-
         database.ref('gameState').remove();
-
       }
-
-      
 
       database.ref('players/' + name).set({ name, avatar: playerAvatar, isModerator });
-
       document.getElementById("authArea").style.display = "none";
-
       document.getElementById("lobbyArea").style.display = "block";
-
       if (isModerator) document.getElementById("modControls").style.display = "block";
-
       document.getElementById("myAvatarContainer").innerHTML = `<img src="${playerAvatar}" style="width:70px;"><br><b>${name}</b>`;
-
-      sendNotification(`🎮 ${name} bergabung ke lobby!`);
-
+      sendNotification(`🎮 ${name} bergabung ke permainan!`);
       listenToGameEvents();
-
       listenToLobby();
-
       listenNotifications();
-
     }
-
-
 
     function listenToLobby() {
-
         database.ref('players').on('value', snap => {
-
             const players = Object.values(snap.val() || {});
-
-            document.getElementById("playerCount").innerText = `${players.length} Pemain Terhubung`;
-
+            document.getElementById("playerCount").innerText = `${players.length} Pemain Bergabung`;
             const list = document.getElementById("lobbyPlayerList");
-
             list.innerHTML = "";
-
             players.forEach(p => {
-
-                list.innerHTML += `<div style="text-align:center; width:60px;"><img src="${p.avatar}" style="width:30px; border-radius:50%"><div style="font-size:10px; overflow:hidden;">${p.name}</div></div>`;
-
+                list.innerHTML += `<div style="text-align:center; width:60px;"><img src="${p.avatar}" style="width:30px; 
+                border-radius:50%"><div style="font-size:10px; overflow:hidden;">${p.name}</div></div>`;
             });
-
         });
-
     }
-
-
 
     // --- CORE GAMEPLAY ---
-
     function listenToGameEvents() {
-
       database.ref('roomControl/isStarted').on('value', snap => { if (snap.val() === true) proceedToGame(); });
-
       database.ref('roomControl/isFinished').on('value', snap => { if (snap.val() === true) showFinalScreen(); });
-
       database.ref('roomControl/isReset').on('value', snap => { if (snap.val() === true) window.location.reload(); });
-
     }
-
-
 
     async function triggerStartGame() {
-
       if (!isModerator) return;
-
       await fetchSoal();
-
       const sudoku = generateSudoku();
-
       const prefilled = pickRandom(36, 11);
-
       const totalSoal = Math.min(15, Object.keys(soalMap).length);
-
       const sCells = pickRandomExclude(36, totalSoal, prefilled);
-
       const sOrder = shuffle([...Array(Object.keys(soalMap).length).keys()]).slice(0, totalSoal);
-
-
-
-      await database.ref('gameState').set({ sudokuSolution: sudoku, prefilledCells: prefilled, soalCells: sCells, soalOrder: sOrder });
-
+      await database.ref('gameState').set({ sudokuSolution: sudoku, prefilledCells: 
+        prefilled, soalCells: sCells, soalOrder: sOrder });
       database.ref('roomControl').set({ isStarted: true, isFinished: false, isReset: false });
-
-      sendNotification("🚀 Game dimulai!");
-
+      sendNotification("🚀 Permainan dimulai!");
     }
-
-
-
+    
     async function proceedToGame() {
-
       const snap = await database.ref('gameState').once('value');
-
       const data = snap.val();
-
       if (!data) {
-
         console.log("Menunggu data game siap...");
-
         return; 
-
       }
-
       document.getElementById("lobbyArea").style.display = "none";
-
       document.getElementById("mainGameArea").style.display = isModerator ? "block" : "flex";
-
       if (isModerator) {
-
         document.getElementById("sidePanel").style.display = "none";
-
         document.getElementById("btnFinish").style.display = "block";
-
         document.getElementById("btnReset").style.display = "block";
-
         document.getElementById("btnDownload").style.display = "block";
-
       } else {
-
         startTimer();
-
       }
-
       sudokuSolution = data.sudokuSolution;
-
       prefilledCells = data.prefilledCells;
-
       soalCells = data.soalCells;
-
       soalOrder = data.soalOrder;
-
-      
-
       await fetchSoal(); 
-
       renderGrid();
-
       initLeaderboard();
-
       listenMoves();
-
     }
-
-
 
     async function fetchSoal() {
-
-        try {
-
-            const res = await fetch(SHEET_CSV_URL);
-
-            const text = await res.text();
-
-            const rows = text.split('\n').slice(1);
-
-            rows.forEach((row, idx) => {
-
-                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
-                if (cols.length >= 2) {
-
-                    soalMap[idx] = cols.slice(0, -1).join(',').replace(/^"|"$/g, '');
-
-                    jawabanMap[idx] = cols[cols.length-1].trim().toLowerCase();
-
-                }
-
-            });
-
-        } catch (e) { console.error("Error CSV"); }
-
+      try {
+        const res = await fetch(SHEET_CSV_URL);
+        const text = await res.text();
+        const rows = text.split('\n').slice(1);
+        rows.forEach((row, idx) => {
+          const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (cols.length >= 2) {
+            soalMap[idx] = cols.slice(0, -1).join(',').replace(/^"|"$/g, '');
+            jawabanMap[idx] = cols[cols.length-1].trim().toLowerCase();
+          }
+        });
+      } catch (e) { console.error("Error CSV"); }
     }
-
-
 
     function renderGrid() {
-
       const grid = document.getElementById('grid');
-
       grid.innerHTML = '';
-
       for (let i = 0; i < 36; i++) {
-
         const cell = document.createElement('div');
-
         cell.className = 'cell';
-
         cell.id = `cell-${i}`;
-
         cell.onmouseenter = () => highlightOnHover(i);
-
         cell.onmouseleave = () => clearHighlight();
-
         if (prefilledCells.includes(i)) {
-
           cell.textContent = sudokuSolution[Math.floor(i/6)][i%6];
-
           cell.classList.add('prefilled');
-
         } else if (!isModerator) {
-
-          cell.onclick = () => { currentSelectedCell = i; document.getElementById('numberModal').classList.remove('hidden'); };
-
+          cell.onclick = () => { currentSelectedCell = i; 
+          document.getElementById('numberModal').classList.remove('hidden'); };
         }
-
         grid.appendChild(cell);
-
       }
-
     }
-
-
 
     function selectNumber(num) {
-
-        closeModal('numberModal');
-
-        const idx = currentSelectedCell;
-
-        const cell = document.getElementById(`cell-${idx}`);
-
-        const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
-
-        
-
-        if (parseInt(num) === correct) {
-
-            if (soalCells.includes(idx)) {
-
-                openQuestionModal(idx, num);
-
-            } else {
-
-                soundCorrect.play();
-
-                cell.classList.add('correct-glow');
-
-                setTimeout(() => cell.classList.remove('correct-glow'), 600);
-
-                comboCount++;
-
-                if(comboCount > maxComboEver) maxComboEver = comboCount;
-
-                updateComboUI();
-
-                submitMove(idx, num, calculatePoints(false));
-
-            }
-
+      closeModal('numberModal');
+      const idx = currentSelectedCell;
+      const cell = document.getElementById(`cell-${idx}`);
+      const correct = sudokuSolution[Math.floor(idx/6)][idx%6];
+      if (parseInt(num) === correct) {
+        if (soalCells.includes(idx)) {
+          openQuestionModal(idx, num);
         } else {
-
-            soundWrong.play();
-
-            comboCount = 0; updateComboUI();
-
-            cell.classList.add('wrong-shake');
-
-            setTimeout(() => cell.classList.remove('wrong-shake'), 400);
-
-            score -= 10; updateScore();
-
-        }
-
+          soundCorrect.play();
+          cell.classList.add('correct-glow');
+          setTimeout(() => cell.classList.remove('correct-glow'), 600);
+          comboCount++;
+          if(comboCount > maxComboEver) maxComboEver = comboCount;
+            updateComboUI();
+            submitMove(idx, num, calculatePoints(false));
+          }
+      } else {
+        soundWrong.play();
+        comboCount = 0; updateComboUI();
+        cell.classList.add('wrong-shake');
+        setTimeout(() => cell.classList.remove('wrong-shake'), 400);
+        score -= 10; updateScore();
+      }
     }
-
-
 
     function openQuestionModal(idx, num) {
-
-        const sIdx = soalOrder[soalCells.indexOf(idx)];
-
-        const question = soalMap[sIdx];
-
-        const modal = document.getElementById('questionModal');
-
-        document.getElementById('questionText').innerHTML = question.includes("http") 
-
-          ? `<img src="${question}" style="width:100%">` : question;
-
-        const optArea = document.getElementById('optionsArea');
-
-        optArea.style.display = "grid";
-
-        optArea.style.gridTemplateColumns = "repeat(5, 1fr)"; 
-
-        optArea.style.gap = "8px";
-
-        optArea.innerHTML = '';
-
-        ['a','b','c','d','e'].forEach(opt => {
-
-            const b = document.createElement('button');
-
-            b.className = 'btn btn-outline-cyan'; b.innerText = opt.toUpperCase();
-
-            b.onclick = () => {
-
-                if (opt === jawabanMap[sIdx]) {
-
-                    soundCorrect.play();
-
-                    physicsCorrectCount++;
-
-                    comboCount++;
-
-                    if(comboCount > maxComboEver) maxComboEver = comboCount;
-
-                    updateComboUI();
-
-                    myAnsweredSoal.push(sIdx + 1);
-
-                    submitMove(idx, num, calculatePoints(true));
-
-                    modal.classList.add('hidden');
-
-                } else {
-
-                    soundWrong.play();
-
-                    physicsWrongCount++;
-
-                    comboCount = 0; updateComboUI();
-
-                    score -= 25; updateScore();
-
-                    modal.classList.add('hidden');
-
-                    alert("Jawaban Salah! -25");
-
-                }
-
-            };
-
-            optArea.appendChild(b);
-
-        });
-
-        modal.classList.remove('hidden');
-
+      const sIdx = soalOrder[soalCells.indexOf(idx)];
+      const question = soalMap[sIdx];
+      const modal = document.getElementById('questionModal');
+      document.getElementById('questionText').innerHTML = question.includes("http") 
+        ? `<img src="${question}" style="width:100%">` : question;
+      const optArea = document.getElementById('optionsArea');
+      optArea.style.display = "grid";
+      optArea.style.gridTemplateColumns = "repeat(5, 1fr)"; 
+      optArea.style.gap = "8px";
+      optArea.innerHTML = '';
+      ['a','b','c','d','e'].forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'btn btn-outline-cyan'; b.innerText = opt.toUpperCase();
+        b.onclick = () => {
+          if (opt === jawabanMap[sIdx]) {
+            soundCorrect.play();
+            physicsCorrectCount++;
+            comboCount++;
+            if(comboCount > maxComboEver) maxComboEver = comboCount;
+              updateComboUI();
+              myAnsweredSoal.push(sIdx + 1);
+              submitMove(idx, num, calculatePoints(true));
+              modal.classList.add('hidden');
+          } else {
+            soundWrong.play();
+            physicsWrongCount++;
+            comboCount = 0; updateComboUI();
+            score -= 25; updateScore();
+            modal.classList.add('hidden');
+            alert("Jawaban Salah! -25");
+          }
+        };
+        optArea.appendChild(b);
+      });
+      modal.classList.remove('hidden');
     }
-
-
 
     // --- ACHIEVEMENTS LOGIC ---
-
     function evaluateAchievements(sortedLeaderboard) {
-
-        const list = document.getElementById('achievementList');
-
-        list.innerHTML = "";
-
-        const badges = [];
-
-
-
-        let maxQuestions = 0;
-
-        sortedLeaderboard.forEach(p => {
-
-            const count = p.answeredQuestions ? p.answeredQuestions.split('|').length : 0;
-
-            if (count > maxQuestions) maxQuestions = count;
-
+      const list = document.getElementById('achievementList');
+      list.innerHTML = "";
+      const badges = [];
+      let maxQuestions = 0;
+      sortedLeaderboard.forEach(p => {
+        const count = p.answeredQuestions ? p.answeredQuestions.split('|').length : 0;
+        if (count > maxQuestions) maxQuestions = count;
+      });
+      const myQuestionCount = myAnsweredSoal.length;
+      if (physicsCorrectCount > 0 && physicsWrongCount === 0) badges.push("🧠 Perfect Physics");
+      if (maxComboEver >= 3) badges.push("🔥 Combo Master");
+      if (sortedLeaderboard[0] && sortedLeaderboard[0].name === currentPlayer) badges.push("👑 Top Rank");
+      if (badges.length === 0) {
+        list.innerHTML = "<div style='font-size:12px; color:gray;'>Terus berjuang untuk dapat badge!</div>";
+      } else {
+        badges.forEach(b => {
+          list.innerHTML += `<span class="achievement-badge">${b}</span>`;
         });
-
-        const myQuestionCount = myAnsweredSoal.length;
-
-        // 1. Perfect Physics (Minimal jawab 1 dan gak ada salah)
-
-        if (physicsCorrectCount > 0 && physicsWrongCount === 0) badges.push("🧠 Perfect Physics");
-
-
-
-        // 2. Combo Master (Pernah combo >= 3)
-
-        if (maxComboEver >= 3) badges.push("🔥 Combo Master");
-
-
-
-        // 3. Top Rank (Posisi 1 di leaderboard)
-
-        if (sortedLeaderboard[0] && sortedLeaderboard[0].name === currentPlayer) badges.push("👑 Top Rank");
-
-
-
-        if (badges.length === 0) {
-
-            list.innerHTML = "<div style='font-size:12px; color:gray;'>Terus berjuang untuk dapat badge!</div>";
-
-        } else {
-
-            badges.forEach(b => {
-
-                list.innerHTML += `<span class="achievement-badge">${b}</span>`;
-
-            });
-
-        }
-
+      }
     }
-
-
 
     function showFinalScreen() {
-
-        clearInterval(timerInterval);
-
-        document.getElementById('grid').classList.add('locked');
-
-        
-
-        database.ref('leaderboard').once('value', snap => {
-
-            const data = Object.values(snap.val() || {}).sort((a,b) => b.score - a.score);
-
-            if(!isModerator) {
-
-                evaluateAchievements(data);
-
-                document.getElementById('finalModal').classList.remove('hidden');
-
-            }
-
-        });
-
+      clearInterval(timerInterval);
+      document.getElementById('grid').classList.add('locked');
+      database.ref('leaderboard').once('value', snap => {
+        const data = Object.values(snap.val() || {}).sort((a,b) => b.score - a.score);
+        if(!isModerator) {
+          evaluateAchievements(data); document.getElementById('finalModal').classList.remove('hidden');
+        }
+      });
     }
-
-
 
     // --- UTILS (KEEPS ORIGINAL) ---
-
     function startTimer() {
-
       timerInterval = setInterval(() => {
-
         totalSeconds++;
-
         const m = Math.floor(totalSeconds/60).toString().padStart(2,'0');
-
         const s = (totalSeconds%60).toString().padStart(2,'0');
-
         document.getElementById('playerTimer').textContent = `${m}:${s}`;
-
       }, 1000);
-
     }
-
-
 
     function calculatePoints(isPhysics) {
-
-        let pts = isPhysics ? 50 : 25;
-
-        if (comboCount === 2) pts += 10;
-
-        if (comboCount >= 3) pts += 25;
-
-        return pts;
-
+      let pts = isPhysics ? 50 : 25;
+      if (comboCount === 2) pts += 10;
+      if (comboCount >= 3) pts += 25;
+      return pts;
     }
-
-
 
     function updateComboUI() {
-
         const txt = document.getElementById('comboText');
-
         document.getElementById('comboVal').innerText = comboCount;
-
         txt.style.display = comboCount > 1 ? "block" : "none";
-
     }
-
-
 
     function submitMove(idx, num, pts) {
-
         score += pts; updateScore();
-
         database.ref("answers/" + idx).set({ player: currentPlayer, number: num });
-
         const type = pts > 25 ? "🧠" : "🔢";
-
         sendNotification(`${type} ${currentPlayer} menjawab kotak (+${pts})`);
-
     }
-
-
 
     function updateScore() {
-
       if(isModerator) return;
-
       document.getElementById('score').textContent = score;
-
-      database.ref('leaderboard/'+currentPlayer).set({ name: currentPlayer, score, avatar: playerAvatar, answeredQuestions: myAnsweredSoal.join('|') });
-
+      database.ref('leaderboard/'+currentPlayer).set({ name: currentPlayer, score, 
+        avatar: playerAvatar, answeredQuestions: myAnsweredSoal.join('|') });
     }
-
-
-
+    
     function initLeaderboard() {
-
       database.ref('leaderboard').on('value', snap => {
-
         const list = document.getElementById("leaderboardList");
-
         const finalist = document.getElementById("finalLeaderboardList");
-
         list.innerHTML = ""; finalist.innerHTML = "";
-
         const data = Object.values(snap.val() || {}).sort((a,b) => b.score - a.score);
-
         data.forEach((e, i) => {
-
-          const html = `<div class="leaderboard-item"><span>${i+1}. <img src="${e.avatar}" class="avatar-sm"> ${e.name}</span><b>${e.score}</b></div>`;
-
+          const html = `<div class="leaderboard-item"><span>${i+1}. 
+          <img src="${e.avatar}" class="avatar-sm"> ${e.name}</span><b>${e.score}</b></div>`;
           list.innerHTML += html; finalist.innerHTML += html;
-
         });
-
       });
-
     }
-
-
 
     function listenMoves() {
-
       database.ref("answers").on("value", snap => {
-
         const moves = snap.val() || {};
-
         Object.entries(moves).forEach(([idx, m]) => {
-
           const cell = document.getElementById(`cell-${idx}`);
-
           if (cell) {
-
             cell.textContent = m.number;
-
             cell.classList.add(m.player === currentPlayer ? "answered-by-you" : "answered-by-other");
-
             cell.onclick = null;
-
           }
-
         });
-
       });
-
     }
-
-
-
+    
     function highlightOnHover(index) {
-
-        const cell = document.getElementById(`cell-${index}`);
-
-        const val = cell.textContent.trim();
-
-        const row = Math.floor(index / 6);
-
-        const col = index % 6;
-
-        for (let i = 0; i < 36; i++) {
-
-            const t = document.getElementById(`cell-${i}`);
-
-            const tR = Math.floor(i / 6);
-
-            const tC = i % 6;
-
-            if (tR === row || tC === col) t.classList.add('highlight-axis');
-
-            if (val !== "" && t.textContent.trim() === val) t.classList.add('highlight-match');
-
-        }
-
+      const cell = document.getElementById(`cell-${index}`);
+      const val = cell.textContent.trim();
+      const row = Math.floor(index / 6);
+      const col = index % 6;
+      for (let i = 0; i < 36; i++) {
+        const t = document.getElementById(`cell-${i}`);
+        const tR = Math.floor(i / 6);
+        const tC = i % 6;
+        if (tR === row || tC === col) t.classList.add('highlight-axis');
+        if (val !== "" && t.textContent.trim() === val) t.classList.add('highlight-match');
+      }
     }
 
-
-
-    function clearHighlight() { document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight-axis', 'highlight-match')); }
-
+    function clearHighlight() { 
+      document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight-axis', 'highlight-match')); 
+    }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
     function sendNotification(msg) { database.ref('notifications').push({ text: msg, time: Date.now() }); }
-
     let gameSessionStart = Date.now();
-
     function listenNotifications() {
-
-        database.ref('notifications').limitToLast(5).on('child_added', snap => {
-
-            const d = snap.val();
-
-            if (d.time > gameSessionStart - 5000) {
-
-                const area = document.getElementById('notifArea');
-
-                const t = document.createElement('div');
-
-                t.className = 'notif-toast'; t.innerText = d.text;
-
-                area.appendChild(t);
-
-                setTimeout(() => {
-
-                    t.style.opacity = '0';
-
-                    setTimeout(() => t.remove(), 500);
-
-                }, 4000);
-
-            }
-
-        });
-
-    }
-
-
-
-    function triggerFinishGame() { if (confirm("Akhiri game?")) database.ref('roomControl/isFinished').set(true); }
-
-    async function resetGameData() {
-
-        if (confirm("Reset total?")) {
-
-            await database.ref().remove();
-
-            window.location.reload();
-
+      database.ref('notifications').limitToLast(5).on('child_added', snap => {
+        const d = snap.val();
+        if (d.time > gameSessionStart - 5000) {
+          const area = document.getElementById('notifArea');
+          const t = document.createElement('div');
+          t.className = 'notif-toast'; t.innerText = d.text;
+          area.appendChild(t);
+          setTimeout(() => {t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 4000);
         }
-
+      });
     }
-
-
+    function triggerFinishGame() { if (confirm("Akhiri game?")) database.ref('roomControl/isFinished').set(true); }
+    async function resetGameData() {
+      if (confirm("Reset total?")) {
+        await database.ref().remove();
+        window.location.reload();
+      }
+    }
 
     function downloadCSV() {
-
-        database.ref('leaderboard').once('value', snap => {
-
-            let csv = "Nama,Skor,Soal\n";
-
-            Object.values(snap.val() || {}).forEach(e => csv += `${e.name},${e.score},"${e.answeredQuestions || '-'}"\n`);
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-
-            const a = document.createElement('a');
-
-            a.href = URL.createObjectURL(blob); a.download = `REKAP_FISDOKU.csv`; a.click();
-
-        });
-
+      database.ref('leaderboard').once('value', snap => {
+        let csv = "Nama,Skor,Soal\n";
+        Object.values(snap.val() || {}).forEach(e => csv += `${e.name},${e.score},"${e.answeredQuestions || '-'}"\n`);
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = `REKAP_FISDOKU.csv`; a.click();
+      });
     }
-
-
 
     function generateSudoku() {
-
       const base = [[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,1,5,6,4],[5,6,4,2,3,1],[3,1,2,6,4,5],[6,4,5,3,1,2]];
-
       const m = shuffle([1,2,3,4,5,6]);
-
       return base.map(r => r.map(v => m[v-1]));
-
     }
-
-    function shuffle(a) { for (let i=a.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
+    function shuffle(a) { for (let i=a.length-1; i>0; i--) { 
+      const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
     function pickRandom(t, c) { return shuffle([...Array(t).keys()]).slice(0, c); }
-
     function pickRandomExclude(t, c, e) { return shuffle([...Array(t).keys()].filter(i => !e.includes(i))).slice(0, c); }
-
   </script>
-
 </body>
-
 </html>
