@@ -22,7 +22,6 @@
     body {
       font-family: 'Poppins', sans-serif;
       background-color: var(--bg-color);
-      /* Gradient dibuat lebih berwarna biru navy agar tidak hitam suram */
       background-image: radial-gradient(circle at 50% 50%, #3a5685 0%, #243b55 100%);
       color: var(--text-light);
       margin: 0;
@@ -49,7 +48,6 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
-    /* --- SUDOKU GRID --- */
     .sudoku-grid { 
       display: grid; 
       grid-template-columns: repeat(6, 1fr); 
@@ -64,7 +62,7 @@
 
     .cell { 
       aspect-ratio: 1/1;
-      background: #253655; /* Warna kotak lebih terang dari bg */
+      background: #253655;
       color: white; 
       display: flex;
       align-items: center;
@@ -92,7 +90,6 @@
       box-shadow: inset 0 0 10px var(--neon-cyan); 
     }
 
-    /* --- BUTTONS --- */
     .btn-primary { 
       background: var(--neon-cyan); 
       color: #1a2a44; 
@@ -135,10 +132,9 @@
     .bottom-buttons .btn {
       font-size: 11px;
       padding: 8px;
-      border: 1px solid currentColor; /* Mengikuti warna teks tombol */
+      border: 1px solid currentColor;
     }
 
-    /* --- NOTIF & MODAL --- */
     .notif-toast { 
       background: var(--panel-bg); 
       border-left: 4px solid var(--neon-cyan); 
@@ -158,7 +154,7 @@
     }
 
     .avatar-sm {
-      width: 24px;   /* Ukuran pas untuk list ranking */
+      width: 24px;
       height: 24px;
       border-radius: 50%;
       vertical-align: middle;
@@ -175,7 +171,6 @@
       font-size: 13px;
     }
 
-    /* --- ANIMATIONS --- */
     .correct-glow { 
       border: 2px solid var(--neon-green) !important; 
       box-shadow: 0 0 15px var(--neon-green) !important; 
@@ -185,7 +180,6 @@
       box-shadow: 0 0 15px var(--neon-red) !important; 
     }
 
-    /* Layouting Tetap Sama */
     .game-container { display: none; flex-direction: 
       column; gap: 15px; max-width: 1200px; margin: 0 auto; 
       }
@@ -307,11 +301,13 @@
     </div>
   </div>
 
+  <!-- MODAL SOAL DENGAN TOMBOL BATAL -->
   <div id="questionModal" class="modal hidden">
     <div class="modal-content">
         <h3 style="color: var(--neon-cyan); margin-top:0; font-size: 18px;">SOAL FISIKA</h3>
         <div id="questionText" style="margin: 15px 0; font-size:14px; line-height: 1.5;"></div>
-        <div id="optionsArea" style="display: grid; grid-template-columns: 1fr; gap: 8px;"></div>
+        <div id="optionsArea" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;"></div>
+        <button class="btn btn-reset" onclick="closeModal('questionModal')">BATAL</button>
     </div>
   </div>
 
@@ -328,7 +324,6 @@
   </div>
   
   <script>
-    // --- KONFIGURASI (KEEPS ORIGINAL) ---
     const MODERATOR_PASSWORD = "fluidoku"; 
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReECKxgkKKOyE30wrZ1hI4a0Eo4naHaigZJ7EZe-KALKUsPJq_4pPPJc0eus6n_Sd5WVeijlYcKVBY/pub?output=csv";
     const firebaseConfig = {
@@ -344,7 +339,6 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // --- STATE GAME ---
     let isModerator = false;
     let currentPlayer = "";
     let score = 0;
@@ -361,14 +355,12 @@
     let currentSelectedCell = null;
     let playerAvatar = "";
 
-    // --- ACHIEVEMENT TRACKERS ---
     let physicsWrongCount = 0;
     let physicsCorrectCount = 0;
     let maxComboEver = 0;
     const soundCorrect = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-funny-yay-6273.mp3'); 
     const soundWrong = new Audio('https://github.com/nobiiiit/kit-sudoku/raw/refs/heads/main/freesound_community-buzzer2-6109.mp3');
 
-    // --- LOGIKA JOIN & LOBBY ---
     function handleJoin() {
       const name = document.getElementById("playerName").value.trim();
       const pass = document.getElementById("modPass").value.trim();
@@ -411,7 +403,6 @@
         });
     }
 
-    // --- CORE GAMEPLAY ---
     function listenToGameEvents() {
       database.ref('roomControl/isStarted').on('value', snap => { if (snap.val() === true) proceedToGame(); });
       database.ref('roomControl/isFinished').on('value', snap => { if (snap.val() === true) showFinalScreen(); });
@@ -435,10 +426,7 @@
     async function proceedToGame() {
       const snap = await database.ref('gameState').once('value');
       const data = snap.val();
-      if (!data) {
-        console.log("Menunggu data game siap...");
-        return; 
-      }
+      if (!data) return; 
       document.getElementById("lobbyArea").style.display = "none";
       document.getElementById("mainGameArea").style.display = isModerator ? "block" : "flex";
       if (isModerator) {
@@ -558,20 +546,14 @@
       modal.classList.remove('hidden');
     }
 
-    // --- ACHIEVEMENTS LOGIC ---
     function evaluateAchievements(sortedLeaderboard) {
       const list = document.getElementById('achievementList');
       list.innerHTML = "";
       const badges = [];
-      let maxQuestions = 0;
-      sortedLeaderboard.forEach(p => {
-        const count = p.answeredQuestions ? p.answeredQuestions.split('|').length : 0;
-        if (count > maxQuestions) maxQuestions = count;
-      });
-      const myQuestionCount = myAnsweredSoal.length;
       if (physicsCorrectCount > 0 && physicsWrongCount === 0) badges.push("🧠 Perfect Physics");
       if (maxComboEver >= 3) badges.push("🔥 Combo Master");
       if (sortedLeaderboard[0] && sortedLeaderboard[0].name === currentPlayer) badges.push("👑 Top Rank");
+      
       if (badges.length === 0) {
         list.innerHTML = "<div style='font-size:12px; color:gray;'>Terus berjuang untuk dapat badge!</div>";
       } else {
@@ -592,7 +574,6 @@
       });
     }
 
-    // --- UTILS (KEEPS ORIGINAL) ---
     function startTimer() {
       timerInterval = setInterval(() => {
         totalSeconds++;
