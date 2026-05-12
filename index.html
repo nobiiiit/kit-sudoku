@@ -199,7 +199,7 @@
       border-radius: 12px; width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box;
       max-height: 90vh; overflow-y: auto; margin: auto; position: relative;
     }
-    #questionText img {
+    #questionText img, #discussionText img {
       max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto 10px;
     }
     .btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; 
@@ -301,7 +301,6 @@
     </div>
   </div>
 
-  <!-- MODAL SOAL DENGAN TOMBOL BATAL -->
   <div id="questionModal" class="modal hidden">
     <div class="modal-content">
         <h3 style="color: var(--neon-cyan); margin-top:0; font-size: 18px;">SOAL FISIKA</h3>
@@ -311,12 +310,21 @@
     </div>
   </div>
 
+  <!-- MODAL PEMBAHASAN BARU -->
+  <div id="discussionModal" class="modal hidden">
+    <div class="modal-content">
+        <h3 style="color: var(--neon-green); margin-top:0; font-size: 18px;">PEMBAHASAN</h3>
+        <div id="discussionText" style="margin: 15px 0;"></div>
+        <button class="btn btn-primary" onclick="closeModal('discussionModal')">LANJUT PERMAINAN</button>
+    </div>
+  </div>
+
   <div id="finalModal" class="modal hidden">
     <div class="modal-content" style="text-align: center;">
         <h2 style="color: var(--neon-green); font-family: 'Orbitron'; margin-bottom: 5px;">GAME OVER</h2>
         <div id="achievementArea" style="margin-bottom: 15px;">
-           <div style="color: var(--neon-yellow); font-size: 12px; margin-bottom: 5px;">YOUR ACHIEVEMENTS:</div>
-           <div id="achievementList"></div>
+            <div style="color: var(--neon-yellow); font-size: 12px; margin-bottom: 5px;">YOUR ACHIEVEMENTS:</div>
+            <div id="achievementList"></div>
         </div>
         <div id="finalLeaderboardList" style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin: 15px 0; text-align:left;"></div>
         <button class="btn btn-primary" onclick="window.location.reload()">KE MENU UTAMA</button>
@@ -326,6 +334,9 @@
   <script>
     const MODERATOR_PASSWORD = "fluidoku"; 
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReECKxgkKKOyE30wrZ1hI4a0Eo4naHaigZJ7EZe-KALKUsPJq_4pPPJc0eus6n_Sd5WVeijlYcKVBY/pub?output=csv";
+    // LINK PEMBAHASAN KAMU
+    const DISCUSSION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrOpHDXkgSTk_m9SPDG3dwUiM6PBXbc4KHYYtBb_cDn2qVCyQiyRHc_m3J6f-jjie2PIILmlsDsDIh/pub?output=csv";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDRb1bnNWXp-0L1nzvxJgUCVhTGwAojK38",
       authDomain: "fisdoku-multiplayer.firebaseapp.com",
@@ -349,6 +360,7 @@
     let prefilledCells = [];
     let soalMap = {};
     let jawabanMap = {};
+    let pembahasanMap = {}; // Map pembahasan
     let soalCells = [];
     let soalOrder = [];
     let myAnsweredSoal = [];
@@ -449,6 +461,7 @@
 
     async function fetchSoal() {
       try {
+        // Fetch Soal
         const res = await fetch(SHEET_CSV_URL);
         const text = await res.text();
         const rows = text.split('\n').slice(1);
@@ -458,6 +471,14 @@
             soalMap[idx] = cols.slice(0, -1).join(',').replace(/^"|"$/g, '');
             jawabanMap[idx] = cols[cols.length-1].trim().toLowerCase();
           }
+        });
+
+        // Fetch Pembahasan
+        const resP = await fetch(DISCUSSION_CSV_URL);
+        const textP = await resP.text();
+        const rowsP = textP.split('\n').slice(1);
+        rowsP.forEach((row, idx) => {
+            pembahasanMap[idx] = row.replace(/^"|"$/g, '').trim();
         });
       } catch (e) { console.error("Error CSV"); }
     }
@@ -513,7 +534,7 @@
       const question = soalMap[sIdx];
       const modal = document.getElementById('questionModal');
       document.getElementById('questionText').innerHTML = question.includes("http") 
-        ? `<img src="${question}" style="width:100%">` : question;
+        ? `<img src="${question}">` : question;
       const optArea = document.getElementById('optionsArea');
       optArea.style.display = "grid";
       optArea.style.gridTemplateColumns = "repeat(5, 1fr)"; 
@@ -532,6 +553,8 @@
               myAnsweredSoal.push(sIdx + 1);
               submitMove(idx, num, calculatePoints(true));
               modal.classList.add('hidden');
+              // TAMPILKAN PEMBAHASAN SETELAH BENAR
+              openDiscussionModal(sIdx);
           } else {
             soundWrong.play();
             physicsWrongCount++;
@@ -544,6 +567,16 @@
         optArea.appendChild(b);
       });
       modal.classList.remove('hidden');
+    }
+
+    // FUNGSI BARU UNTUK MODAL PEMBAHASAN
+    function openDiscussionModal(sIdx) {
+        const modalP = document.getElementById('discussionModal');
+        const contentP = pembahasanMap[sIdx];
+        document.getElementById('discussionText').innerHTML = contentP && contentP.includes("http") 
+            ? `<img src="${contentP}">` 
+            : (contentP || "Pembahasan tidak tersedia.");
+        modalP.classList.remove('hidden');
     }
 
     function evaluateAchievements(sortedLeaderboard) {
@@ -640,11 +673,13 @@
     
     function highlightOnHover(index) {
       const cell = document.getElementById(`cell-${index}`);
+      if(!cell) return;
       const val = cell.textContent.trim();
       const row = Math.floor(index / 6);
       const col = index % 6;
       for (let i = 0; i < 36; i++) {
         const t = document.getElementById(`cell-${i}`);
+        if(!t) continue;
         const tR = Math.floor(i / 6);
         const tC = i % 6;
         if (tR === row || tC === col) t.classList.add('highlight-axis');
